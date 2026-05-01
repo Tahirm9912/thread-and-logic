@@ -44,28 +44,37 @@
   <!-- PRODUCT GRID -->
 <div class="listing-grid">
 
-  <!-- PRODUCT CARD -->
-  <div class="listing-card">
+<% if (products && products.length > 0) { %>
 
-    <!-- CLICKABLE AREA -->
-    <a href="/product" class="card-link">
-      <img src="/images/image 2.jpg" alt="Product">
+  <% products.forEach(product => { %>
+    <!-- card -->
+            <div class="listing-card">
+    
+          <a href="/product/<%= product.productid %>" class="card-link">
+            <img src="<%= product.image_url %>" alt="Product">
+    
+            <div class="listing-info">
+              <h3><%= product.name %></h3>
+              <p class="price">Rs <%= product.price || '---' %></p>
+            </div>
+          </a>
+    
+          <div class="listing-actions">
+            <button class="btn-cart">Add to Cart</button>
+            <button class="btn-buy">Buy Now</button>
+          </div>
+    
+        </div>
+  <% }) %>
 
-      <div class="listing-info">
-        <h3>Summer Lawn Suit</h3>
-        <p class="price">Rs 3,800</p>
-      </div>
-    </a>
+<% } else { %>
 
-    <!-- BUTTONS (NOT CLICKABLE LINK) -->
-    <div class="listing-actions">
-      <button class="btn-cart">Add to Cart</button>
-      <button class="btn-buy">Buy Now</button>
-    </div>
+  <p>No products found</p>
 
-  </div>
+<% } %>
 
-  <!-- Duplicate more cards as needed -->
+
+
 
 </div>
 

@@ -1,38 +1,60 @@
+<% const safeItems = items || [] %>
+
 <div class="cart-overlay" id="cartOverlay"></div>
 
 <aside class="cart-drawer" id="cartDrawer">
+
   <h3 class="cart-title">Your Cart</h3>
 
-  <div class="cart-item">
-    <input type="checkbox" class="cart-check">
+  <% if (safeItems.length === 0) { %>
 
-    <img src="/images/image 1.jpg">
+    <p class="empty">Cart is empty</p>
 
-    <div class="cart-info">
-      <h4>Elegant Dress</h4>
-      <p>Rs 4,500</p>
+  <% } else { %>
 
-      <div class="cart-meta">
+    <% safeItems.forEach(item => { %>
 
-        <div class="qty-box">
-          <button class="qty-btn minus">-</button>
-          <input type="number" value="1" class="qty-input">
-          <button class="qty-btn plus">+</button>
+      <div class="cart-item">
+
+        <input type="checkbox" class="cart-check">
+
+        <img src="<%= item.image_url || '/images/default.jpg' %>">
+
+        <div class="cart-info">
+
+          <h4><%= item.name %></h4>
+
+          <p>Rs <%= item.price %></p>
+
+          <small>
+            Size: <%= item.size || '-' %> |
+            Color: <%= item.color || '-' %>
+          </small>
+
+          <div class="cart-meta">
+
+            <div class="qty-box">
+              <button class="qty-btn minus">-</button>
+
+              <input type="number"
+                     value="<%= item.quantity || 1 %>"
+                     class="qty-input">
+
+              <button class="qty-btn plus">+</button>
+            </div>
+
+          </div>
+
         </div>
-
-        <select class="size-select">
-          <option>S</option>
-          <option selected>M</option>
-          <option>L</option>
-        </select>
-
       </div>
-    </div>
-  </div>
+
+    <% }) %>
+
+  <% } %>
 
   <div class="cart-actions">
     <a href="/list" class="continue">Continue Shopping</a>
-      <button class="checkout">
-        Checkout</button>
+    <a href="/checkout" class="checkout">Checkout</a>
   </div>
+
 </aside>

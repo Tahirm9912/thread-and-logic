@@ -3,84 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velmora</title>
-    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title><%= product.name %></title>
+
+    <link rel="shortcut icon" href="/resources/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/product.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
 
 <!-- NAVBAR -->
- <%- include('../partials/header') %>
+<%- include('../partials/header') %>
+
 
 <!-- PRODUCT -->
- <section class="product-page">
+<section class="product-page">
 
   <!-- LEFT: IMAGE GALLERY -->
   <div class="product-images">
 
     <!-- MAIN IMAGE -->
     <div class="main-image">
-      <img id="mainImg" src="images/image 2.jpg">
+      <img id="mainImg" src="<%= images[0]?.image_url %>" alt="Product">
     </div>
 
     <!-- THUMBNAILS -->
     <div class="thumbs">
-      <img src="images/image 2.jpg" class="thumb active">
-      <img src="images/image 1.jpg" class="thumb">
-      <img src="images/image 5.webp" class="thumb">
-      <img src="images/b.webp" class="thumb">
+      <% images.forEach((img, index) => { %>
+        <img 
+          src="<%= img.image_url %>" 
+          class="thumb <%= index === 0 ? 'active' : '' %>"
+          onclick="changeImage(this)"
+        >
+      <% }) %>
     </div>
 
   </div>
 
+
   <!-- RIGHT: PRODUCT DETAILS -->
   <div class="product-info">
 
-    <h1 class="product-title">Cotton Casual Wear</h1>
+    <h1 class="product-title"><%= product.name %></h1>
 
-    <p class="product-price">Rs 4,500</p>
+    <!-- 🔥 DYNAMIC PRICE -->
+    <p class="product-price" id="price">Select options</p>
 
     <p class="product-desc">
-      Premium cotton outfit designed for comfort and elegance.
+      <%= product.description %>
     </p>
-
-    <!-- FIXED DETAILS -->
-    <div class="product-meta">
-      <p><strong>Fabric:</strong> Cotton</p>
-      <p><strong>Pieces:</strong> 3 Piece</p>
-      <p><strong>Dupatta:</strong> Included</p>
-      <p><strong>Work:</strong> Printed</p>
-    </div>
 
     <!-- OPTIONS -->
     <div class="product-options">
 
       <!-- SIZE -->
       <label>Size</label>
-      <select>
-        <option>S</option>
-        <option selected>M</option>
-        <option>L</option>
-        <option>XL</option>
+      <select id="sizeSelect">
+        <% [...new Set(variants.map(v => v.size))].forEach(size => { %>
+          <option value="<%= size %>"><%= size %></option>
+        <% }) %>
       </select>
 
       <!-- COLOR -->
       <label>Color</label>
-      <select>
-        <option>Black</option>
-        <option>Blue</option>
-        <option>Beige</option>
+      <select id="colorSelect">
+        <% [...new Set(variants.map(v => v.color))].forEach(color => { %>
+          <option value="<%= color %>"><%= color %></option>
+        <% }) %>
       </select>
 
       <!-- QUANTITY -->
       <label>Quantity</label>
       <div class="qty-box">
-        <button class="minus">-</button>
-        <input type="number" value="1">
-        <button class="plus">+</button>
+        <button type="button" onclick="changeQty(-1)">-</button>
+        <input type="number" id="qty" value="1" min="1">
+        <button type="button" onclick="changeQty(1)">+</button>
       </div>
 
     </div>
@@ -95,55 +93,69 @@
 
 </section>
 
-<section class="listing reveal">
 
-  <!-- TOP BAR -->
-  <div class="listing-top">
-
-    <h2 class="listing-heading">All Products</h2>
-
-
-  </div>
-
-  <!-- PRODUCT GRID -->
-<div class="listing-grid">
-
-  <!-- PRODUCT CARD -->
-  <div class="listing-card">
-
-    <!-- CLICKABLE AREA -->
-    <a href="/product" class="card-link">
-      <img src="/images/image 2.jpg" alt="Product">
-
-      <div class="listing-info">
-        <h3>Summer Lawn Suit</h3>
-        <p class="price">Rs 3,800</p>
-      </div>
-    </a>
-
-    <!-- BUTTONS (NOT CLICKABLE LINK) -->
-    <div class="listing-actions">
-      <button class="btn-cart">Add to Cart</button>
-      <button class="btn-buy">Buy Now</button>
-    </div>
-
-  </div>
-
-  <!-- Duplicate more cards as needed -->
-
-</div>
-
-</section>
+<!-- FOOTER / PARTIALS -->
+<%- include('../partials/menubar') %>
+<%- include('../partials/cart') %>
+<%- include('../partials/search') %>
+<%- include('../partials/footer') %>
 
 
- <%- include('../partials/menubar') %>
- <%- include('../partials/cart') %>
- <%- include('../partials/search') %>
- <%- include('../partials/footer') %>
+<!-- ========================= -->
+<!-- 🔥 JAVASCRIPT (DYNAMIC) -->
+<!-- ========================= -->
+
+<script>
+  // ✅ VARIANTS FROM BACKEND
+  const variants = <%- JSON.stringify(variants) %>;
+
+  const colorSelect = document.getElementById("colorSelect");
+  const sizeSelect = document.getElementById("sizeSelect");
+  const priceEl = document.getElementById("price");
+
+  // 🔥 UPDATE PRICE BASED ON SELECTION
+  function updateVariant() {
+    const selectedColor = colorSelect.value;
+    const selectedSize = sizeSelect.value;
+
+    const found = variants.find(v =>
+      v.color === selectedColor && v.size === selectedSize
+    );
+
+    if (found) {
+      priceEl.innerText = "Rs " + found.price;
+    } else {
+      priceEl.innerText = "Not available";
+    }
+  }
+
+  colorSelect.addEventListener("change", updateVariant);
+  sizeSelect.addEventListener("change", updateVariant);
+
+  // initial load
+  updateVariant();
 
 
+  // 🖼 CHANGE MAIN IMAGE
+  function changeImage(el) {
+    document.getElementById("mainImg").src = el.src;
+
+    document.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
+    el.classList.add("active");
+  }
 
 
-<script src="/js/product.js"></script>
+  // 🔢 QUANTITY CONTROL
+  function changeQty(val) {
+    const qtyInput = document.getElementById("qty");
+    let current = parseInt(qtyInput.value);
+
+    current += val;
+    if (current < 1) current = 1;
+
+    qtyInput.value = current;
+  }
+</script>
+
 </body>
 </html>

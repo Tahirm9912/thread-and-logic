@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 import authRoutes from "./routes/authRoutes.js";
 import pageRoutes from "./routes/pageRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
+import { cartMiddleware } from "./middleware/cartMiddleware.js";
 
 dotenv.config();
 
@@ -22,7 +23,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // 🔐 auth must run BEFORE anything else
+
+
+
+
 app.use(authMiddleware);
+app.use(cartMiddleware);
+
+
 
 // 🌍 make user available in all EJS pages
 app.use((req, res, next) => {

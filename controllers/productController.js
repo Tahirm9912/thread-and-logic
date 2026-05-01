@@ -7,30 +7,31 @@ import {
 } from "../models/productModel.js";
 
 
+
 // ==========================
 // 🟢 SHOW ALL PRODUCTS
 // ==========================
-export const showProducts = async (req, res) => {
-  const products = await getAllProducts();
-
-  res.render("layouts/list", {
-    products
-  });
-};
-
-
-// ==========================
-// 🔍 SHOW SINGLE PRODUCT
-// ==========================
 export const showProduct = async (req, res) => {
-  const data = await getProductFull(req.params.id);
+  try {
+    const productId = req.params.id;
 
-  res.render("layouts/product", {
-    product: data.product,
-    images: data.images,
-    variants: data.variants
-  });
+    const data = await getProductFull(productId);
+
+    // 🔥 THIS IS WHERE YOU PUT IT
+    res.render("layouts/product", {
+      product: data.product,
+      images: data.images,
+      variants: data.variants
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.send("Error loading product");
+  }
 };
+
+
+
 
 
 // ==========================
@@ -94,4 +95,13 @@ export const addProductController = async (req, res) => {
     console.log(err);
     return res.send("Error creating product");
   }
+};
+
+
+export const showProducts = async (req, res) => {
+  const products = await getAllProducts();
+
+  res.render("layouts/list", {
+    products: products || []
+  });
 };
