@@ -1,0 +1,35 @@
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment secrets and API keys
+.env
+*.pem
+
+# Log files
+*.log
+npm-debug.log*
+
+
+node_modules/
+dist/
+build/
+.cache/
+
+
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+*.class
+*.jar
+*.war
+/target/
+
+
+.vscode/
+.idea/
+*.swp
+*.sublime-project

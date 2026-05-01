@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velmora</title>
+    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/contact.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<%- include("../partials/header-ns") %>
+
+
+<!-- CONTACT US -->
+
+<section class="contact-section reveal">
+
+  <h1 class="contact-title">Contact Us</h1>
+
+  <!-- CONTACT INFO -->
+  <div class="contact-grid">
+
+    <div class="contact-card">
+      <i class="fas fa-map-marker-alt"></i>
+      <h3>Address</h3>
+      <p>Jhelum, Punjab, Pakistan</p>
+    </div>
+
+    <a href="#" class="contact-card">
+      <i class="fas fa-phone"></i>
+      <h3>Call Us</h3>
+      <p>+92 300 1234567</p>
+    </a>
+
+    <a href="#" class="contact-card">
+      <i class="fas fa-envelope"></i>
+      <h3>Email</h3>
+      <p>support@velmora.com</p>
+    </a>
+
+    <a href="#" class="contact-card">
+      <i class="fab fa-whatsapp"></i>
+      <h3>WhatsApp</h3>
+      <p>Chat Now</p>
+    </a>
+
+    <a href="#" class="contact-card">
+      <i class="fab fa-instagram"></i>
+      <h3>Instagram</h3>
+      <p>Follow Us</p>
+    </a>
+
+    <a href="#" class="contact-card">
+      <i class="fab fa-linkedin"></i>
+      <h3>LinkedIn</h3>
+      <p>Connect</p>
+    </a>
+
+    <a href="#" class="contact-card">
+      <i class="fab fa-facebook"></i>
+      <h3>Facebook</h3>
+      <p>Visit Page</p>
+    </a>
+
+    <a href="#" class="contact-card">
+      <i class="fab fa-tiktok"></i>
+      <h3>TikTok</h3>
+      <p>Watch Videos</p>
+    </a>
+
+  </div>
+</section>
+
+<!-- MESSAGE FORM -->
+<section class="message-section reveal">
+
+  <h2>Send Us a Message</h2>
+
+  <form class="contact-form">
+
+    <input type="text" placeholder="Your Name" required>
+
+    <input type="text" placeholder="Contact Number" required>
+
+    <input type="email" placeholder="Email Address" required>
+
+    <textarea placeholder="Your Message..." rows="5" required></textarea>
+
+    <button type="submit">Send Message</button>
+
+  </form>
+
+</section>
+
+<!-- GOOGLE MAP -->
+<section class="map-section reveal">
+
+  <iframe 
+    src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3347.2149655900216!2d73.6936581878662!3d32.9717299277446!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1777099188333!5m2!1sen!2s"
+    
+    frameborder="0"
+    allowfullscreen>
+  </iframe>
+
+  
+
+</section>
+
+<%- include("../partials/footer") %>
+<%- include("../partials/menubar") %>
+<%- include("../partials/cart") %>
+
+
+<script src="/js/contact.js"></script>
+</body>
+</html>

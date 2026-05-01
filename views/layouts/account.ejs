@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Now!</title>
+    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/account.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+ <%- include('../partials/header-ns') %>
+
+<!-- ACCOUNT -->
+
+<section class="account-section">
+
+  <div class="account-container">
+
+    <!-- USER INFO -->
+    <div class="account-info">
+
+      <h2 class="account-name">Tahir Mehmood</h2>
+
+      <div class="info-grid">
+        <p><strong>Gender:</strong> Male</p>
+        <p><strong>Email:</strong> example@email.com</p>
+        <p><strong>Phone:</strong> 03001234567</p>
+        <p><strong>Address:</strong> Jhelum, Pakistan</p>
+      </div>
+
+    </div>
+
+
+    <!-- ORDER HISTORY -->
+    <div class="order-history">
+
+      <h3>Order History</h3>
+
+      <div class="table-wrapper">
+
+        <table class="order-table">
+
+          <thead>
+            <tr>
+              <th>Sr.</th>
+              <th>Image</th>
+              <th>Product</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr>
+              <td>1</td>
+
+              <td>
+                <a href="#">
+                  <img src="../assets/images/image 1.jpg" alt="Product">
+                </a>
+              </td>
+
+              <td>
+                <a href="#">Elegant Lawn Suit</a>
+              </td>
+
+              <td>25 Apr 2026</td>
+              <td class="status delivered">Delivered</td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+
+              <td>
+                <a href="#">
+                  <img src="../assets/images/image 2.jpg" alt="Product">
+                </a>
+              </td>
+
+              <td>
+                <a href="#">Cotton Casual Wear</a>
+              </td>
+
+              <td>20 Apr 2026</td>
+              <td class="status pending">Pending</td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+ <%- include('../partials/menubar') %>
+ <%- include('../partials/cart') %>
+ <%- include('../partials/footer') %>
+
+
+
+
+
+<script src="../js/account.js"></script>
+</body>
+</html>

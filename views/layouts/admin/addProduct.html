@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Product</title>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    .form-container {
+      max-width: 750px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    textarea {
+      height: 100px;
+      resize: none;
+    }
+
+    .row {
+      display: flex;
+      gap: 15px;
+    }
+
+    .row .form-group {
+      flex: 1;
+    }
+
+    .toggle-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: black;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .btn:hover {
+      background: #333;
+    }
+
+    .image-input {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <h2>Add Product</h2>
+
+  <form action="/admin/add-product" method="POST" enctype="multipart/form-data">
+
+    <!-- Name -->
+    <div class="form-group">
+      <label>Product Name</label>
+      <input type="text" name="name" required>
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label>Description</label>
+      <textarea name="description" required></textarea>
+    </div>
+
+    <!-- Price & Stock -->
+    <div class="row">
+      <div class="form-group">
+        <label>Price</label>
+        <input type="number" name="price" required>
+      </div>
+
+      <div class="form-group">
+        <label>Stock</label>
+        <input type="number" name="stock" required>
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="form-group">
+      <label>Category</label>
+      <input type="text" name="category" required>
+    </div>
+
+    <!-- DROPDOWNS -->
+
+    <div class="row">
+      <!-- Color -->
+      <div class="form-group">
+        <label>Color</label>
+        <select name="color">
+          <option value="">Select Color</option>
+          <option>Black</option>
+          <option>White</option>
+          <option>Red</option>
+          <option>Blue</option>
+          <option>Green</option>
+          <option>Pink</option>
+          <option>Beige</option>
+          <option>Maroon</option>
+        </select>
+      </div>
+
+      <!-- Size -->
+      <div class="form-group">
+        <label>Size</label>
+        <select name="size">
+          <option value="">Select Size</option>
+          <option>S</option>
+          <option>M</option>
+          <option>L</option>
+          <option>XL</option>
+          <option>XXL</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Fabric -->
+      <div class="form-group">
+        <label>Fabric</label>
+        <select name="fabric">
+          <option value="">Select Fabric</option>
+          <option>Cotton</option>
+          <option>Lawn</option>
+          <option>Silk</option>
+          <option>Chiffon</option>
+          <option>Linen</option>
+          <option>Khaddar</option>
+          <option>Denim</option>
+        </select>
+      </div>
+
+      <!-- Piece Type -->
+      <div class="form-group">
+        <label>Piece Type</label>
+        <select name="piece_type">
+          <option value="">Select Type</option>
+          <option>1-Piece</option>
+          <option>2-Piece</option>
+          <option>3-Piece</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Toggles -->
+    <div class="form-group">
+      <label>Flags</label>
+      <div class="toggle-group">
+        <div class="toggle">
+          <input type="checkbox" name="is_trending">
+          <span>Trending</span>
+        </div>
+
+        <div class="toggle">
+          <input type="checkbox" name="is_top">
+          <span>Top</span>
+        </div>
+
+        <div class="toggle">
+          <input type="checkbox" name="is_featured">
+          <span>Featured</span>
+        </div>
+
+        <div class="toggle">
+          <input type="checkbox" name="is_active" checked>
+          <span>Active</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Images -->
+    <div class="form-group">
+      <label>Product Images</label>
+      <div id="imageContainer">
+        <input type="file" name="images" class="image-input" accept="image/*">
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" class="btn">Add Product</button>
+
+  </form>
+</div>
+
+<script>
+  const container = document.getElementById("imageContainer");
+
+  container.addEventListener("change", function () {
+    const inputs = container.querySelectorAll("input[type='file']");
+    const lastInput = inputs[inputs.length - 1];
+
+    if (lastInput.files.length > 0) {
+      const newInput = document.createElement("input");
+      newInput.type = "file";
+      newInput.name = "images";
+      newInput.accept = "image/*";
+      newInput.classList.add("image-input");
+
+      container.appendChild(newInput);
+    }
+  });
+</script>
+
+</body>
+</html>

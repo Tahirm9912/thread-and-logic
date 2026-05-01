@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velmora</title>
+    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+ <%- include('../partials/header') %>
+
+<!-- HERO -->
+<section class="hero reveal">
+  <div class="slider">
+    <a href="/list">
+
+      <div class="slides">
+        <img src="images/a.webp" class="slide active">
+        <img src="images/image 2.jpg" class="slide">
+        <img src="images/image 1.jpg" class="slide">
+        <img src="images/b.webp" class="slide">
+        <img src="images/image 5.webp" class="slide">
+      </div>
+    </a>
+    <button class="prev">&#10094;</button>
+    <button class="next">&#10095;</button>
+    <div class="dots"></div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="categories reveal">
+  <h2 class="cat-heading">Shop by Categories</h2>
+  <div class="cat-grid">
+    <a href="#" class="cat-item">
+      <div class="cat-circle"><img src="images/image 1.jpg" alt="Category"></div>
+      <span>Men</span>
+    </a>
+  </div>
+</section>
+
+<!-- TRENDING -->
+<section class="trending reveal">
+  <h2 class="trend-heading">Trending Concepts</h2>
+
+  <div class="trend-grid">
+
+    <div class="trend-card">
+
+      <!-- ONLY image/title clickable -->
+      <a href="/product" class="trend-link">
+        <img src="images/image 2.jpg" alt="Dress">
+      </a>
+
+      <div class="trend-info">
+        <h3>
+          <a href="/product" class="trend-link">Cotton Casual Wear</a>
+        </h3>
+
+        <p class="price">Rs 4,500</p>
+
+        <div class="trend-actions">
+          <button class="btn-cart">Add to Cart</button>
+          <button class="btn-buy">Buy Now</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+ <%- include('../partials/menubar') %>
+ <%- include('../partials/cart') %>
+ <%- include('../partials/search') %>
+ <%- include('../partials/footer') %>
+
+ <!-- POPUP -->
+<div class="popup-overlay" id="popup">
+  <div class="popup-box">
+
+    <span class="popup-close" id="popupClose">&times;</span>
+
+    <!-- IMAGE POPUP -->
+    <img src="/images/a.webp" alt="Popup" class="popup-img">
+
+    <!-- OPTIONAL BUTTON -->
+    <a href="/list" class="popup-btn">Shop Now</a>
+
+  </div>
+</div>
+
+
+
+
+
+<script src="../js/home.js"></script>
+</body>
+</html>

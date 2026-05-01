@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Products</title>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    .container {
+      width: 95%;
+      margin: 40px auto;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
+
+    th {
+      background: black;
+      color: white;
+      font-weight: 500;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    img {
+      width: 55px;
+      height: 55px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .tick {
+      font-weight: bold;
+      font-size: 16px;
+      color: green;
+    }
+
+    .cross {
+      font-weight: bold;
+      font-size: 16px;
+      color: red;
+    }
+
+    .actions a {
+      padding: 5px 8px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 12px;
+      margin: 2px;
+      display: inline-block;
+    }
+
+    .edit {
+      background: #007bff;
+      color: white;
+    }
+
+    .delete {
+      background: red;
+      color: white;
+    }
+
+    .filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filters input,
+.filters select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>All Products</h2>
+
+  <% if (products.length === 0) { %>
+    <p>No products found.</p>
+  <% } else { %>
+
+
+    <div class="filters">
+
+  <input type="text" id="searchInput" placeholder="Search product name...">
+
+  <select id="categoryFilter">
+    <option value="">All Categories</option>
+    <option>Women</option>
+    <option>Men</option>
+    <option>Kids</option>
+  </select>
+
+  <select id="trendingFilter">
+    <option value="">Trending?</option>
+    <option value="true">Yes</option>
+    <option value="false">No</option>
+  </select>
+
+  <select id="featuredFilter">
+    <option value="">Featured?</option>
+    <option value="true">Yes</option>
+    <option value="false">No</option>
+  </select>
+
+</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Name</th>
+
+        <!-- Variants -->
+        <th>Color</th>
+        <th>Size</th>
+        <th>Fabric</th>
+        <th>Type</th>
+
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Category</th>
+
+        <!-- Flags -->
+        <th>Trending</th>
+        <th>Top</th>
+        <th>Featured</th>
+        <th>Active</th>
+
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% products.forEach(product => { %>
+        <tr>
+
+          <!-- Image -->
+          <td>
+            <img src="<%= product.images && product.images[0] ? product.images[0] : '/images/default.png' %>" />
+          </td>
+
+          <!-- Name -->
+          <td><%= product.name %></td>
+
+          <!-- Variants -->
+          <td><%= product.color || '-' %></td>
+          <td><%= product.size || '-' %></td>
+          <td><%= product.fabric || '-' %></td>
+          <td><%= product.piece_type || '-' %></td>
+
+          <!-- Price -->
+          <td>Rs. <%= product.price %></td>
+
+          <!-- Stock -->
+          <td><%= product.stock %></td>
+
+          <!-- Category -->
+          <td><%= product.category %></td>
+
+          <!-- Flags -->
+          <td class="<%= product.is_trending ? 'tick' : 'cross' %>">
+            <%= product.is_trending ? '✔' : '✖' %>
+          </td>
+
+          <td class="<%= product.is_top ? 'tick' : 'cross' %>">
+            <%= product.is_top ? '✔' : '✖' %>
+          </td>
+
+          <td class="<%= product.is_featured ? 'tick' : 'cross' %>">
+            <%= product.is_featured ? '✔' : '✖' %>
+          </td>
+
+          <td class="<%= product.is_active ? 'tick' : 'cross' %>">
+            <%= product.is_active ? '✔' : '✖' %>
+          </td>
+
+          <!-- Actions -->
+          <td class="actions">
+            <a href="/admin/edit-product/<%= product.id %>" class="edit">Edit</a>
+
+            <a href="/admin/delete-product/<%= product.id %>" 
+               class="delete"
+               onclick="return confirm('Delete this product?')">
+               Delete
+            </a>
+          </td>
+
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <% } %>
+</div>
+<script>
+  const searchInput = document.getElementById("searchInput");
+  const categoryFilter = document.getElementById("categoryFilter");
+  const trendingFilter = document.getElementById("trendingFilter");
+  const featuredFilter = document.getElementById("featuredFilter");
+
+  const rows = document.querySelectorAll("tbody tr");
+
+  function filterTable() {
+    const search = searchInput.value.toLowerCase();
+    const category = categoryFilter.value;
+    const trending = trendingFilter.value;
+    const featured = featuredFilter.value;
+
+    rows.forEach(row => {
+      const name = row.dataset.name;
+      const rowCategory = row.dataset.category;
+      const rowTrending = row.dataset.trending;
+      const rowFeatured = row.dataset.featured;
+
+      let show = true;
+
+      if (search && !name.includes(search)) show = false;
+      if (category && rowCategory !== category) show = false;
+      if (trending && rowTrending !== trending) show = false;
+      if (featured && rowFeatured !== featured) show = false;
+
+      row.style.display = show ? "" : "none";
+    });
+  }
+
+  searchInput.addEventListener("input", filterTable);
+  categoryFilter.addEventListener("change", filterTable);
+  trendingFilter.addEventListener("change", filterTable);
+  featuredFilter.addEventListener("change", filterTable);
+</script>
+</body>
+</html>

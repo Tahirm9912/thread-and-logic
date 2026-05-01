@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velmora</title>
+    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/product.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+ <%- include('../partials/header') %>
+
+<!-- PRODUCT -->
+ <section class="product-page">
+
+  <!-- LEFT: IMAGE GALLERY -->
+  <div class="product-images">
+
+    <!-- MAIN IMAGE -->
+    <div class="main-image">
+      <img id="mainImg" src="images/image 2.jpg">
+    </div>
+
+    <!-- THUMBNAILS -->
+    <div class="thumbs">
+      <img src="images/image 2.jpg" class="thumb active">
+      <img src="images/image 1.jpg" class="thumb">
+      <img src="images/image 5.webp" class="thumb">
+      <img src="images/b.webp" class="thumb">
+    </div>
+
+  </div>
+
+  <!-- RIGHT: PRODUCT DETAILS -->
+  <div class="product-info">
+
+    <h1 class="product-title">Cotton Casual Wear</h1>
+
+    <p class="product-price">Rs 4,500</p>
+
+    <p class="product-desc">
+      Premium cotton outfit designed for comfort and elegance.
+    </p>
+
+    <!-- FIXED DETAILS -->
+    <div class="product-meta">
+      <p><strong>Fabric:</strong> Cotton</p>
+      <p><strong>Pieces:</strong> 3 Piece</p>
+      <p><strong>Dupatta:</strong> Included</p>
+      <p><strong>Work:</strong> Printed</p>
+    </div>
+
+    <!-- OPTIONS -->
+    <div class="product-options">
+
+      <!-- SIZE -->
+      <label>Size</label>
+      <select>
+        <option>S</option>
+        <option selected>M</option>
+        <option>L</option>
+        <option>XL</option>
+      </select>
+
+      <!-- COLOR -->
+      <label>Color</label>
+      <select>
+        <option>Black</option>
+        <option>Blue</option>
+        <option>Beige</option>
+      </select>
+
+      <!-- QUANTITY -->
+      <label>Quantity</label>
+      <div class="qty-box">
+        <button class="minus">-</button>
+        <input type="number" value="1">
+        <button class="plus">+</button>
+      </div>
+
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="product-actions">
+      <button class="btn-cart">Add to Cart</button>
+      <button class="btn-buy">Buy Now</button>
+    </div>
+
+  </div>
+
+</section>
+
+<section class="listing reveal">
+
+  <!-- TOP BAR -->
+  <div class="listing-top">
+
+    <h2 class="listing-heading">All Products</h2>
+
+
+  </div>
+
+  <!-- PRODUCT GRID -->
+<div class="listing-grid">
+
+  <!-- PRODUCT CARD -->
+  <div class="listing-card">
+
+    <!-- CLICKABLE AREA -->
+    <a href="/product" class="card-link">
+      <img src="/images/image 2.jpg" alt="Product">
+
+      <div class="listing-info">
+        <h3>Summer Lawn Suit</h3>
+        <p class="price">Rs 3,800</p>
+      </div>
+    </a>
+
+    <!-- BUTTONS (NOT CLICKABLE LINK) -->
+    <div class="listing-actions">
+      <button class="btn-cart">Add to Cart</button>
+      <button class="btn-buy">Buy Now</button>
+    </div>
+
+  </div>
+
+  <!-- Duplicate more cards as needed -->
+
+</div>
+
+</section>
+
+
+ <%- include('../partials/menubar') %>
+ <%- include('../partials/cart') %>
+ <%- include('../partials/search') %>
+ <%- include('../partials/footer') %>
+
+
+
+
+<script src="/js/product.js"></script>
+</body>
+</html>

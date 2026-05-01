@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Now!</title>
+    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/checkout.css">
+</head>
+
+<body>
+
+<%- include("../partials/header-ns") %>
+
+
+<!-- CHECKOUT SECTION -->
+<section class="checkout-section">
+
+  <div class="checkout-container">
+
+    <h2 class="checkout-title">Checkout</h2>
+
+    <div class="table-wrapper">
+
+      <table class="checkout-table">
+
+        <thead>
+          <tr>
+            <th>Sr.</th>
+            <th>Image</th>
+            <th>Product</th>
+            <th>Size</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td>1</td>
+
+            <td>
+              <img src="../assets/images/image 1.jpg">
+            </td>
+
+            <td>
+              <a href="#">Elegant Dress</a>
+            </td>
+
+            <td>
+              <select class="size-select">
+                <option value="S">S</option>
+                <option value="M" selected>M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+              </select>
+            </td>
+
+            <td>
+              <div class="qty-box">
+                <button class="qty-btn minus">-</button>
+                <input type="number" value="2" min="1" class="qty-input">
+                <button class="qty-btn plus">+</button>
+              </div>
+            </td>
+            <td id='box-price'>
+              Rs. 5000
+            </td>
+
+            <td>
+              <button class="remove-btn">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>2</td>
+
+            <td>
+              <img src="../assets/images/image 2.jpg">
+            </td>
+
+            <td>
+              <a href="#">Cotton Casual Wear</a>
+            </td>
+
+<td>
+  <select class="size-select">
+    <option value="S">S</option>
+    <option value="M" selected>M</option>
+    <option value="L">L</option>
+    <option value="XL">XL</option>
+  </select>
+</td>
+
+<td>
+  <div class="qty-box">
+    <button class="qty-btn minus">-</button>
+    <input type="number" value="2" min="1" class="qty-input">
+    <button class="qty-btn plus">+</button>
+  </div>
+</td>
+            <td id="price-box">
+              Rs. 4500
+            </td>
+
+            <td>
+              <button class="remove-btn">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- TOTALS -->
+    <div class="checkout-summary">
+
+      <div class="summary-row">
+        <span>Items Total:</span>
+        <span>Rs 9,500</span>
+      </div>
+
+      <div class="summary-row">
+        <span>Delivery Charges:</span>
+        <span>Rs 200</span>
+      </div>
+
+      <div class="summary-row total">
+        <span>Total:</span>
+        <span>Rs 9,700</span>
+      </div>
+
+      <button class="checkout-btn">
+        Proceed to Checkout
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+ <%- include('../partials/menubar') %>
+ <%- include('../partials/cart') %>
+ <%- include('../partials/footer') %>
+  <script src="/js/checkout.js"></script>
+</body>
+</html>

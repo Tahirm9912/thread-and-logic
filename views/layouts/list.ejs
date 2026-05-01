@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Now!</title>
+    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/list.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<%- include("../partials/header") %>
+
+
+<!-- LISTING SECTION -->
+<section class="listing reveal">
+
+  <!-- TOP BAR -->
+  <div class="listing-top">
+
+    <h2 class="listing-heading">All Products</h2>
+
+    <div class="listing-controls">
+
+      <!-- FILTER BUTTON -->
+      <button class="filter-btn" id="filterBtn">
+        <i class="fas fa-sliders-h"></i> Filter
+      </button>
+
+      <!-- SORT DROPDOWN -->
+      <select class="sort-select">
+        <option value="default">Sort By</option>
+        <option value="low">Price: Low to High</option>
+        <option value="high">Price: High to Low</option>
+        <option value="new">Newest First</option>
+      </select>
+
+    </div>
+  </div>
+
+  <!-- PRODUCT GRID -->
+<div class="listing-grid">
+
+  <!-- PRODUCT CARD -->
+  <div class="listing-card">
+
+    <!-- CLICKABLE AREA -->
+    <a href="/product" class="card-link">
+      <img src="/images/image 2.jpg" alt="Product">
+
+      <div class="listing-info">
+        <h3>Summer Lawn Suit</h3>
+        <p class="price">Rs 3,800</p>
+      </div>
+    </a>
+
+    <!-- BUTTONS (NOT CLICKABLE LINK) -->
+    <div class="listing-actions">
+      <button class="btn-cart">Add to Cart</button>
+      <button class="btn-buy">Buy Now</button>
+    </div>
+
+  </div>
+
+  <!-- Duplicate more cards as needed -->
+
+</div>
+
+</section>
+
+
+<!-- FILTER DRAWER -->
+<div class="filter-overlay" id="filterOverlay"></div>
+
+<aside class="filter-drawer" id="filterDrawer">
+
+  <h3>Filters</h3>
+
+  <!-- CATEGORY -->
+  <div class="filter-group">
+    <h4>Shop By</h4>
+    <label><input type="checkbox"> New Arrivals</label>
+    <label><input type="checkbox"> Best Sellers</label>
+  </div>
+
+  <!-- SEASON -->
+  <div class="filter-group">
+    <h4>Season</h4>
+    <label><input type="checkbox"> Summer</label>
+    <label><input type="checkbox"> Winter</label>
+  </div>
+
+  <!-- FABRIC -->
+  <div class="filter-group">
+    <h4>Fabric</h4>
+    <label><input type="checkbox"> Lawn</label>
+    <label><input type="checkbox"> Cotton</label>
+  </div>
+
+  <!-- PIECE -->
+  <div class="filter-group">
+    <h4>Piece</h4>
+    <label><input type="checkbox"> 2 Piece</label>
+    <label><input type="checkbox"> 3 Piece</label>
+  </div>
+
+  <!-- PRICE -->
+  <div class="filter-group">
+    <h4>Price</h4>
+    <label><input type="checkbox"> Under 3000</label>
+    <label><input type="checkbox"> 3000 - 5000</label>
+  </div>
+
+  <!-- AVAILABILITY -->
+  <div class="filter-group">
+    <h4>Availability</h4>
+    <label><input type="checkbox"> In Stock</label>
+    <label><input type="checkbox"> Out of Stock</label>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="filter-actions">
+    <button class="reset-btn">Reset</button>
+    <button class="apply-btn">Apply</button>
+  </div>
+
+</aside>
+
+<%- include("../partials/menubar") %>
+<%- include("../partials/cart") %>
+<%- include("../partials/search") %>
+<%- include("../partials/footer") %>
+
+<script src="/js/list.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<div class="overlay" id="overlay"></div>
+
+<aside class="side-menu" id="sideMenu">
+  <div class="menu-top">
+    <% if (!user) { %>
+      <a href="/login" class="btn-box"><i class="fas fa-user"></i> Account</a>
+    <% } else { %>
+      <a href="/account" class="btn-box"><i class="fas fa-user"></i> 
+        <%= user.name %>
+      </a>
+      
+
+    <% } %>
+    <a href="/contact" class="btn-box"><i class="fas fa-phone"></i> Contact</a>
+    <a href="/logout" class="btn-box"><i class="fas fa-sign-out"></i> Logout</a>
+  </div>
+
+  <hr>
+
+  <h4>Trending</h4>
+  <a href="/list">New Arrivals</a>
+  <a href="/list">Best Sellers</a>
+
+  <hr>
+
+  <div class="dropdown">
+    <button class="drop-btn">Women</button>
+    <div class="drop-content">
+      <a href="/list">Unstitched</a>
+      <a href="/list">Ready to Wear</a>
+    </div>
+  </div>
+
+  <div class="dropdown">
+    <button class="drop-btn">Men</button>
+    <div class="drop-content">
+      <a href="/list">Cotton</a>
+      <a href="/list">Wash n Wear</a>
+    </div>
+  </div>
+
+  <hr>
+
+  <a href="/account" class="final-link">Return & Exchange</a>
+</aside>

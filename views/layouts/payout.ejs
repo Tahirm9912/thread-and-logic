@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Now!</title>
+    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/payout.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+ <%- include('../partials/header-nscm') %>
+
+<!-- PAYOUT -->
+ <section class="payment-page">
+
+  <h2 class="payment-title">Payment</h2>
+
+  <div class="payment-container">
+
+    <!-- LEFT -->
+    <div class="payment-left">
+
+      <h3>Select Payment Method</h3>
+
+      <label class="pay-option">
+        <input type="radio" name="pay" checked>
+        Cash on Delivery
+      </label>
+
+      <label class="pay-option">
+        <input type="radio" name="pay">
+        Card / Online Payment
+      </label>
+
+      <label class="pay-option">
+        <input type="radio" name="pay">
+        Bank Transfer
+      </label>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="payment-right">
+
+      <h3>Order Summary</h3>
+
+      <div class="summary-item">
+        <span>Subtotal</span>
+        <span>Rs 4500</span>
+      </div>
+
+      <div class="summary-item">
+        <span>Delivery</span>
+        <span>Rs 200</span>
+      </div>
+
+      <hr>
+
+      <div class="summary-total">
+        <span>Total</span>
+        <span>Rs 4700</span>
+      </div>
+
+      <button class="pay-btn">Pay Now</button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+
+
+
+
+
+<script src="../js/payout.js"></script>
+</body>
+</html>
