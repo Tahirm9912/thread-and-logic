@@ -163,3 +163,57 @@ document.querySelectorAll(".btn-cart").forEach(btn => {
     addToCartAnimation();
   });
 });
+
+
+// window.addToCart = function(productId, variantId) {
+//   console.log("CLICK WORKING", productId, variantId);
+
+//   fetch("/cart/add", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json"
+//     },
+//     body: JSON.stringify({
+//       product_id: productId,
+//       variant_id: variantId,
+//       quantity: 1
+//     })
+//   })
+//   .then(res => res.json())
+//   .then(data => {
+//     console.log(data);
+//   });
+// };
+
+
+
+// 🔥 MAKE FUNCTION GLOBAL
+window.addToCart = function (productId, variantId) {
+  console.log("CLICK WORKING", productId, variantId);
+
+  fetch("/cart/add", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      product_id: productId,
+      variant_id: variantId,
+      quantity: 1
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("RESPONSE:", data);
+
+    if (data.success) {
+      alert("Added to cart");
+      location.reload();
+    } else {
+      alert("Error adding to cart");
+    }
+  })
+  .catch(err => {
+    console.log("FETCH ERROR:", err);
+  });
+};

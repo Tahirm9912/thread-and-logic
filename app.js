@@ -6,6 +6,8 @@ import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/authRoutes.js";
 import pageRoutes from "./routes/pageRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
+
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { cartMiddleware } from "./middleware/cartMiddleware.js";
 
@@ -23,24 +25,25 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // 🔐 auth must run BEFORE anything else
-
-
-
-
-app.use(authMiddleware);
-app.use(cartMiddleware);
-
-
-
-// 🌍 make user available in all EJS pages
-app.use((req, res, next) => {
-  res.locals.user = req.user || null;
+  
+  
+  
+  
+  app.use(authMiddleware);
+  app.use(cartMiddleware);
+  
+  
+  
+  // 🌍 make user available in all EJS pages
+  app.use((req, res, next) => {
+    res.locals.user = req.user || null;
   next();
 });
 
 // 🧭 routes (AFTER middleware)
 app.use("/api/auth", authRoutes);
 app.use("/", pageRoutes);
+app.use("/cart", cartRoutes);
 
 // 🎨 view engine
 app.set("view engine", "ejs");
