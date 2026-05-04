@@ -731,3 +731,24 @@ body {
   75% { transform: rotate(-10deg); }
   100% { transform: rotate(0); }
 }
+
+/* Tags  */
+
+
+.product-tags {
+  margin: 12px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 20px;
+  background: #f3f3f3;
+  border: 1px solid #ddd;
+  color: #333;
+  text-transform: capitalize;
+  text-decoration: none;
+}

@@ -57,10 +57,25 @@
               <h3><%= product.name %></h3>
               <p class="price">Rs <%= product.price || '---' %></p>
             </div>
+            <div class="product-tags">
+
+  <% product.tags.forEach(tag => { %>
+    
+    <a href="/list?tag=<%= tag %>" class="tag">
+      <%= tag %>
+    </a>
+
+  <% }) %>
+
+</div>
           </a>
     
           <div class="listing-actions">
-            <button onclick="addToCart(1,2)" class="btn-cart">Add to Cart</button> 
+<button 
+  onclick="addToCart(<%= product.productid %>, <%= product.variant_id %>)"
+  class="btn-cart">
+  Add to Cart
+</button>
             <button class="btn-buy">Buy Now</button>
           </div>
     

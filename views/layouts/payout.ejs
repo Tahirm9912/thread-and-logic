@@ -26,20 +26,20 @@
 
       <h3>Select Payment Method</h3>
 
-      <label class="pay-option">
-        <input type="radio" name="pay" checked>
-        Cash on Delivery
-      </label>
+<label class="pay-option">
+  <input type="radio" name="pay" value="cod" checked>
+  Cash on Delivery
+</label>
 
-      <label class="pay-option">
-        <input type="radio" name="pay">
-        Card / Online Payment
-      </label>
+<label class="pay-option">
+  <input type="radio" name="pay" value="easypaisa">
+  Easypaisa
+</label>
+<div id="qrBox" style="display:none; margin-top:20px;">
+  <p>Scan QR & pay via Easypaisa</p>
+  <img src="/images/qr.png" width="200">
+</div>
 
-      <label class="pay-option">
-        <input type="radio" name="pay">
-        Bank Transfer
-      </label>
 
     </div>
 
@@ -65,7 +65,9 @@
         <span>Rs 4700</span>
       </div>
 
-      <button class="pay-btn">Pay Now</button>
+      <button onclick="confirmOrder()" class="pay-btn">
+  Confirm Order
+</button>
 
     </div>
 

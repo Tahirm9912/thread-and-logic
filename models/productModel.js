@@ -72,13 +72,17 @@ export const addVariant = async (variantData) => {
 // ==========================
 export const getAllProducts = async () => {
   const result = await pool.query(`
-    SELECT p.*, pi.image_url
-    FROM products p
-    LEFT JOIN product_images pi 
-      ON p.productid = pi.product_id 
-      AND pi.is_primary = true
-    WHERE p.is_active = true
-    ORDER BY p.created_at DESC
+    SELECT 
+  p.productid,
+  p.name,
+  p.price,
+  MIN(pv.variant_id) as variant_id,
+  pi.image_url
+FROM products p
+LEFT JOIN product_variants pv ON p.productid = pv.product_id
+LEFT JOIN product_images pi 
+  ON pi.product_id = p.productid AND pi.is_primary = true
+GROUP BY p.productid, pi.image_url;
   `);
 
   return result.rows;

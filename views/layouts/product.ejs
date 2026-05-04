@@ -1,60 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= product.name %></title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= product.name %></title>
 
-    <link rel="shortcut icon" href="/resources/favicon.ico">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/product.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="shortcut icon" href="/resources/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/product.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <%- include('../partials/header') %>
 
-
-<!-- PRODUCT -->
 <section class="product-page">
 
-  <!-- LEFT: IMAGE GALLERY -->
+  <!-- LEFT -->
   <div class="product-images">
-
-    <!-- MAIN IMAGE -->
     <div class="main-image">
-      <img id="mainImg" src="<%= images[0]?.image_url %>" alt="Product">
+      <img id="mainImg" src="<%= images[0]?.image_url %>">
     </div>
 
-    <!-- THUMBNAILS -->
     <div class="thumbs">
-      <% images.forEach((img, index) => { %>
+      <% images.forEach((img, i) => { %>
         <img 
           src="<%= img.image_url %>" 
-          class="thumb <%= index === 0 ? 'active' : '' %>"
-          onclick="changeImage(this)"
-        >
+          class="thumb <%= i === 0 ? 'active' : '' %>"
+          onclick="changeImage(this)">
       <% }) %>
     </div>
-
   </div>
 
-
-  <!-- RIGHT: PRODUCT DETAILS -->
+  <!-- RIGHT -->
   <div class="product-info">
 
-    <h1 class="product-title"><%= product.name %></h1>
+    <h1><%= product.name %></h1>
 
-    <!-- 🔥 DYNAMIC PRICE -->
-    <p class="product-price" id="price">Select options</p>
+    <p id="price">Select options</p>
 
-    <p class="product-desc">
-      <%= product.description %>
-    </p>
+    <p><%= product.description %></p>
 
-    <!-- OPTIONS -->
+
+    <!-- 🔥 TAGS SECTION (NEW) -->
+<% const tags = Array.isArray(product.tags)
+  ? product.tags
+  : (product.tags ? product.tags.split(',') : []);
+%>
+
+<% if (product.tags && product.tags.length > 0) { %>
+
+  <div class="product-tags">
+    <% product.tags.forEach(tag => { %>
+      <a href="/list?tag=<%= tag %>" class="tag">
+        <%= tag %>
+      </a>
+    <% }) %>
+  </div>
+
+<% } %>
+
+
     <div class="product-options">
 
       <!-- SIZE -->
@@ -83,9 +90,8 @@
 
     </div>
 
-    <!-- ACTIONS -->
     <div class="product-actions">
-      <button class="btn-cart">Add to Cart</button>
+      <button onclick="handleAddToCart()" class="btn-cart">Add to Cart</button>
       <button class="btn-buy">Buy Now</button>
     </div>
 
@@ -93,69 +99,105 @@
 
 </section>
 
-
-<!-- FOOTER / PARTIALS -->
 <%- include('../partials/menubar') %>
 <%- include('../partials/cart') %>
 <%- include('../partials/search') %>
 <%- include('../partials/footer') %>
 
-
-<!-- ========================= -->
-<!-- 🔥 JAVASCRIPT (DYNAMIC) -->
-<!-- ========================= -->
-
 <script>
-  // ✅ VARIANTS FROM BACKEND
   const variants = <%- JSON.stringify(variants) %>;
 
-  const colorSelect = document.getElementById("colorSelect");
   const sizeSelect = document.getElementById("sizeSelect");
+  const colorSelect = document.getElementById("colorSelect");
   const priceEl = document.getElementById("price");
+  const qtyInput = document.getElementById("qty");
 
-  // 🔥 UPDATE PRICE BASED ON SELECTION
+  // 🔥 UPDATE PRICE
   function updateVariant() {
-    const selectedColor = colorSelect.value;
-    const selectedSize = sizeSelect.value;
-
-    const found = variants.find(v =>
-      v.color === selectedColor && v.size === selectedSize
+    const variant = variants.find(v =>
+      v.size === sizeSelect.value &&
+      v.color === colorSelect.value
     );
 
-    if (found) {
-      priceEl.innerText = "Rs " + found.price;
+    if (variant) {
+      priceEl.innerText = "Rs " + variant.price;
     } else {
       priceEl.innerText = "Not available";
     }
   }
 
-  colorSelect.addEventListener("change", updateVariant);
   sizeSelect.addEventListener("change", updateVariant);
+  colorSelect.addEventListener("change", updateVariant);
 
-  // initial load
   updateVariant();
 
+  // 🔥 GET SELECTED VARIANT
+  function getVariant() {
+    return variants.find(v =>
+      v.size === sizeSelect.value &&
+      v.color === colorSelect.value
+    );
+  }
 
-  // 🖼 CHANGE MAIN IMAGE
+  // 🔥 ADD TO CART
+  function handleAddToCart() {
+
+    const variant = getVariant();
+
+    if (!variant) {
+      alert("Combination not available");
+      return;
+    }
+
+    const quantity = parseInt(qtyInput.value);
+
+    fetch("/cart/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        product_id: variant.product_id,
+        variant_id: variant.variant_id,
+        quantity: quantity
+      })
+    })
+    .then(res => {
+      if (res.redirected) {
+        window.location.href = res.url;
+        return;
+      }
+      return res.json();
+    })
+    .then(data => {
+      if (!data) return;
+
+      if (data.success) {
+        addToCartAnimation();
+      } else {
+        alert(data.message);
+      }
+    })
+    .catch(err => console.log(err));
+  }
+
+  // IMAGE
   function changeImage(el) {
     document.getElementById("mainImg").src = el.src;
-
     document.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
     el.classList.add("active");
   }
 
-
-  // 🔢 QUANTITY CONTROL
+  // QTY
   function changeQty(val) {
-    const qtyInput = document.getElementById("qty");
-    let current = parseInt(qtyInput.value);
-
-    current += val;
-    if (current < 1) current = 1;
-
-    qtyInput.value = current;
+    let v = parseInt(qtyInput.value);
+    v += val;
+    if (v < 1) v = 1;
+    qtyInput.value = v;
   }
 </script>
+
+<script src="/js/product.js"></script>
 
 </body>
 </html>

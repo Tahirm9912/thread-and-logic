@@ -86,3 +86,95 @@ document.querySelectorAll(".cart-item").forEach(item => {
 });
 
 
+
+function confirmOrder() {
+  const method = document.querySelector('input[name="pay"]:checked').value;
+
+  fetch("/order/confirm", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ method })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("Order placed successfully!");
+
+      // redirect to account page
+      window.location.href = "/account";
+    } else {
+      alert(data.message || "Failed");
+    }
+  })
+  .catch(err => {
+    console.log(err);
+    alert("Error placing order");
+  });
+}
+
+
+function confirmOrder() {
+  const method = document.querySelector('input[name="pay"]:checked').value;
+
+  fetch("/order/confirm", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ method })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("Order placed successfully!");
+
+      // redirect to account page
+      window.location.href = "/account";
+    } else {
+      alert(data.message || "Failed");
+    }
+  })
+  .catch(err => {
+    console.log(err);
+    alert("Error placing order");
+  });
+}
+
+
+function goToPayout() {
+  const selected = [];
+
+  document.querySelectorAll(".item-select:checked").forEach(cb => {
+    selected.push(parseInt(cb.value));
+  });
+
+  if (selected.length === 0) {
+    alert("Select at least one item");
+    return;
+  }
+
+  // 🔥 SEND TO BACKEND
+  fetch("/order/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      selectedItems: selected
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      window.location.href = "/payout";
+    } else {
+      alert(data.message);
+    }
+  })
+  .catch(err => {
+    console.log(err);
+    alert("Error");
+  });
+}

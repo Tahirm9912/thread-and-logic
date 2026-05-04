@@ -1,23 +1,17 @@
 import jwt from "jsonwebtoken";
 
-
-
-
-
-
 export const protectPage = (req, res, next) => {
-  const token = req.cookies.token;
-
-  if (!token) {
-    req.user = null;
-    return res.redirect("/login");
-  }
-
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
-    res.locals.user = req.user; 
+    const token = req.cookies.token;
+
+    if (!token) return res.redirect("/login");
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = decoded;
+
     next();
-  } catch {
+  } catch (err) {
     return res.redirect("/login");
   }
 };

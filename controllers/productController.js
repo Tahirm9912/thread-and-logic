@@ -13,20 +13,43 @@ import {
 // ==========================
 export const showProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
+    const id = req.params.id;
 
-    const data = await getProductFull(productId);
+    const product = await pool.query(
+      "SELECT * FROM products WHERE productid = $1",
+      [id]
+    );
 
-    // 🔥 THIS IS WHERE YOU PUT IT
+    const variants = await pool.query(
+      "SELECT * FROM product_variants WHERE product_id = $1",
+      [id]
+    );
+
+    const images = await pool.query(
+      "SELECT * FROM product_images WHERE product_id = $1",
+      [id]
+    );
+
+    // 🔥 TAGS PARSING ADDED HERE
+    const productData = product.rows[0];
+
+    if (productData.tags) {
+      productData.tags = productData.tags
+        .split(",")
+        .map(tag => tag.trim());
+    } else {
+      productData.tags = [];
+    }
+
     res.render("layouts/product", {
-      product: data.product,
-      images: data.images,
-      variants: data.variants
+      product: productData,
+      variants: variants.rows,
+      images: images.rows
     });
 
   } catch (err) {
     console.log(err);
-    res.send("Error loading product");
+    res.send("error");
   }
 };
 
@@ -98,10 +121,65 @@ export const addProductController = async (req, res) => {
 };
 
 
-export const showProducts = async (req, res) => {
-  const products = await getAllProducts();
+import pool from "../config/db.js";
 
-  res.render("layouts/list", {
-    products: products || []
-  });
+// ==========================
+// 🟢 GET ALL PRODUCTS (ONLY WITH VARIANTS)
+// ==========================
+export const showProducts = async (req, res) => {
+  try {
+    const { tag } = req.query;
+
+    let query = `
+      SELECT 
+        p.productid,
+        p.name,
+        p.price,
+        p.tags,
+        pv.variant_id,
+        pi.image_url
+
+      FROM products p
+
+      JOIN LATERAL (
+        SELECT variant_id 
+        FROM product_variants 
+        WHERE product_id = p.productid 
+        LIMIT 1
+      ) pv ON true
+
+      LEFT JOIN product_images pi 
+        ON pi.product_id = p.productid 
+        AND pi.is_primary = true
+
+      WHERE p.is_active = true
+    `;
+
+    let values = [];
+
+    // 🔥 FILTER BY TAG
+    if (tag) {
+      query += ` AND p.tags ILIKE $1`;
+      values.push(`%${tag}%`);
+    }
+
+    const result = await pool.query(query, values);
+
+    // parse tags
+    const products = result.rows.map(p => ({
+      ...p,
+      tags: p.tags
+        ? p.tags.split(",").map(t => t.trim())
+        : []
+    }));
+
+    res.render("layouts/list", {
+      products,
+      activeTag: tag || null
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.send("Error loading products");
+  }
 };

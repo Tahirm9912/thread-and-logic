@@ -11,7 +11,7 @@
 
 <body>
 
-<%- include("../partials/header-ns") %>
+<%- include("../partials/header-nscm") %>
 
 
 <!-- CHECKOUT SECTION -->
@@ -27,6 +27,7 @@
 
         <thead>
           <tr>
+            <th>  </th>
             <th>Sr.</th>
             <th>Image</th>
             <th>Product</th>
@@ -37,85 +38,73 @@
           </tr>
         </thead>
 
-        <tbody>
+<tbody>
 
-          <tr>
-            <td>1</td>
+<% let index = 1 %>
 
-            <td>
-              <img src="../assets/images/image 1.jpg">
-            </td>
+<% items.forEach(item => { %>
 
-            <td>
-              <a href="#">Elegant Dress</a>
-            </td>
+<tr>
 
-            <td>
-              <select class="size-select">
-                <option value="S">S</option>
-                <option value="M" selected>M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
-              </select>
-            </td>
+  <!-- SELECT ITEM -->
+  <td>
+    <input 
+      type="checkbox" 
+      class="item-select" 
+      value="<%= item.id %>"
+      checked
+    >
+  </td>
 
-            <td>
-              <div class="qty-box">
-                <button class="qty-btn minus">-</button>
-                <input type="number" value="2" min="1" class="qty-input">
-                <button class="qty-btn plus">+</button>
-              </div>
-            </td>
-            <td id='box-price'>
-              Rs. 5000
-            </td>
+  <td><%= index++ %></td>
 
-            <td>
-              <button class="remove-btn">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
+  <td>
+    <img src="<%= item.image_url || '/images/default.jpg' %>" width="60">
+  </td>
 
-          <tr>
-            <td>2</td>
+  <td>
+    <a href="/product/<%= item.productid %>">
+      <%= item.name %>
+    </a>
+  </td>
 
-            <td>
-              <img src="../assets/images/image 2.jpg">
-            </td>
+  <td>
+    <select class="size-select">
+      <option selected><%= item.size %></option>
+    </select>
+  </td>
 
-            <td>
-              <a href="#">Cotton Casual Wear</a>
-            </td>
+  <td>
+    <div class="qty-box">
+      <button class="qty-btn minus">-</button>
 
-<td>
-  <select class="size-select">
-    <option value="S">S</option>
-    <option value="M" selected>M</option>
-    <option value="L">L</option>
-    <option value="XL">XL</option>
-  </select>
-</td>
+      <input 
+        type="number" 
+        value="<%= item.quantity %>" 
+        min="1"
+        class="qty-input"
+        data-id="<%= item.id %>"
+      >
 
-<td>
-  <div class="qty-box">
-    <button class="qty-btn minus">-</button>
-    <input type="number" value="2" min="1" class="qty-input">
-    <button class="qty-btn plus">+</button>
-  </div>
-</td>
-            <td id="price-box">
-              Rs. 4500
-            </td>
+      <button class="qty-btn plus">+</button>
+    </div>
+  </td>
 
-            <td>
-              <button class="remove-btn">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
+  <td>
+    Rs <%= item.price * item.quantity %>
+  </td>
 
-        </tbody>
+  <td>
+    <button class="remove-btn" onclick="removeItem(<%= item.id %>)">
+      <i class="fas fa-trash"></i>
+    </button>
+  </td>
+
+</tr>
+
+<% }) %>
+
+</tbody>
 
       </table>
 
@@ -125,24 +114,24 @@
     <!-- TOTALS -->
     <div class="checkout-summary">
 
-      <div class="summary-row">
-        <span>Items Total:</span>
-        <span>Rs 9,500</span>
-      </div>
+<div class="summary-row">
+  <span>Items Total:</span>
+  <span>Rs <%= total %></span>
+</div>
 
-      <div class="summary-row">
-        <span>Delivery Charges:</span>
-        <span>Rs 200</span>
-      </div>
+<div class="summary-row">
+  <span>Delivery Charges:</span>
+  <span>Rs 200</span>
+</div>
 
-      <div class="summary-row total">
-        <span>Total:</span>
-        <span>Rs 9,700</span>
-      </div>
+<div class="summary-row total">
+  <span>Total:</span>
+  <span>Rs <%= total + 200 %></span>
+</div>
 
-      <button class="checkout-btn">
-        Proceed to Checkout
-      </button>
+<button onclick="goToPayout()" class="checkout-btn">
+  Proceed to Checkout
+</button>
 
     </div>
 

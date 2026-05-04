@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Now!</title>
-    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/account.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account</title>
+
+  <link rel="stylesheet" href="/css/account.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
 
-<!-- NAVBAR -->
- <%- include('../partials/header-ns') %>
-
-<!-- ACCOUNT -->
+<%- include('../partials/header-ns') %>
 
 <section class="account-section">
 
@@ -23,17 +20,44 @@
     <!-- USER INFO -->
     <div class="account-info">
 
-      <h2 class="account-name">Tahir Mehmood</h2>
+      <div class="account-header">
+        <h2 class="account-name"><%= user.name %></h2>
 
-      <div class="info-grid">
-        <p><strong>Gender:</strong> Male</p>
-        <p><strong>Email:</strong> example@email.com</p>
-        <p><strong>Phone:</strong> 03001234567</p>
-        <p><strong>Address:</strong> Jhelum, Pakistan</p>
+        <button onclick="toggleEdit()" class="edit-btn">
+          Edit Info
+        </button>
       </div>
 
-    </div>
+      <!-- VIEW MODE -->
+      <div id="viewMode" class="info-grid">
+        <p><strong>Email:</strong> <%= user.email %></p>
+        <p><strong>Phone:</strong> <%= user.phone || '-' %></p>
+        <p><strong>Address:</strong> <%= user.address || '-' %></p>
+      </div>
 
+      <!-- EDIT MODE -->
+      <form id="editForm" class="info-grid" style="display:none;" onsubmit="updateProfile(event)">
+
+        <p>
+          <strong>Email:</strong><br>
+          <input type="email" name="email" value="<%= user.email %>">
+        </p>
+
+        <p>
+          <strong>Phone:</strong><br>
+          <input type="text" name="phone" value="<%= user.phone || '' %>">
+        </p>
+
+        <p>
+          <strong>Address:</strong><br>
+          <input type="text" name="address" value="<%= user.address || '' %>">
+        </p>
+
+        <button type="submit" class="save-btn">Save</button>
+
+      </form>
+
+    </div>
 
     <!-- ORDER HISTORY -->
     <div class="order-history">
@@ -46,7 +70,7 @@
 
           <thead>
             <tr>
-              <th>Sr.</th>
+              <th>#</th>
               <th>Image</th>
               <th>Product</th>
               <th>Date</th>
@@ -56,39 +80,46 @@
 
           <tbody>
 
-            <tr>
-              <td>1</td>
+            <% if (orders && orders.length > 0) { %>
 
-              <td>
-                <a href="#">
-                  <img src="../assets/images/image 1.jpg" alt="Product">
-                </a>
-              </td>
+              <% let i = 1 %>
 
-              <td>
-                <a href="#">Elegant Lawn Suit</a>
-              </td>
+              <% orders.forEach(order => { %>
 
-              <td>25 Apr 2026</td>
-              <td class="status delivered">Delivered</td>
-            </tr>
+                <% order.items.forEach(item => { %>
 
-            <tr>
-              <td>2</td>
+                  <tr>
+                    <td><%= i++ %></td>
 
-              <td>
-                <a href="#">
-                  <img src="../assets/images/image 2.jpg" alt="Product">
-                </a>
-              </td>
+                    <td>
+                      <img src="<%= item.image_url || '/images/default.jpg' %>" width="60">
+                    </td>
 
-              <td>
-                <a href="#">Cotton Casual Wear</a>
-              </td>
+                    <td>
+                      <%= item.name %>
+                    </td>
 
-              <td>20 Apr 2026</td>
-              <td class="status pending">Pending</td>
-            </tr>
+                    <td>
+                      <%= new Date(order.created_at).toDateString() %>
+                    </td>
+
+                    <td class="status <%= order.status %>">
+                      <%= order.status %>
+                    </td>
+
+                  </tr>
+
+                <% }) %>
+
+              <% }) %>
+
+            <% } else { %>
+
+              <tr>
+                <td colspan="5">No orders yet</td>
+              </tr>
+
+            <% } %>
 
           </tbody>
 
@@ -102,14 +133,11 @@
 
 </section>
 
- <%- include('../partials/menubar') %>
- <%- include('../partials/cart') %>
- <%- include('../partials/footer') %>
+<%- include('../partials/menubar') %>
+<%- include('../partials/cart') %>
+<%- include('../partials/footer') %>
 
+<script src="/js/account.js"></script>
 
-
-
-
-<script src="../js/account.js"></script>
 </body>
 </html>

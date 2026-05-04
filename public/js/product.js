@@ -1,92 +1,122 @@
-
-// ─── SIDE MENU ────────────────────────────────────────────────────────
+// ===============================
+// 🟢 SIDE MENU
+// ===============================
 const menu     = document.getElementById("sideMenu");
 const overlay  = document.getElementById("overlay");
 const toggle   = document.getElementById("menuToggle");
 
-toggle.addEventListener("click", () => {
-  menu.classList.toggle("active");
-  overlay.classList.toggle("active");
-  toggle.classList.toggle("fa-bars");
-  toggle.classList.toggle("fa-times");
-});
-
-overlay.addEventListener("click", () => {
-  menu.classList.remove("active");
-  overlay.classList.remove("active");
-  toggle.classList.add("fa-bars");
-  toggle.classList.remove("fa-times");
-});
-
-// dropdowns inside side menu
-document.querySelectorAll(".dropdown").forEach(d => {
-  d.querySelector(".drop-btn").addEventListener("click", (e) => {
-    e.stopPropagation();
-    d.classList.toggle("active");
+if (toggle) {
+  toggle.addEventListener("click", () => {
+    menu.classList.toggle("active");
+    overlay.classList.toggle("active");
+    toggle.classList.toggle("fa-bars");
+    toggle.classList.toggle("fa-times");
   });
+}
+
+if (overlay) {
+  overlay.addEventListener("click", () => {
+    menu.classList.remove("active");
+    overlay.classList.remove("active");
+    toggle.classList.add("fa-bars");
+    toggle.classList.remove("fa-times");
+  });
+}
+
+// dropdowns
+document.querySelectorAll(".dropdown").forEach(d => {
+  const btn = d.querySelector(".drop-btn");
+  if (btn) {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      d.classList.toggle("active");
+    });
+  }
 });
 
 
-// ─── CART DRAWER ──────────────────────────────────────────────────────
+// ===============================
+// 🟢 CART DRAWER
+// ===============================
 const cartDrawer  = document.getElementById("cartDrawer");
 const cartOverlay = document.getElementById("cartOverlay");
+const cartIcon    = document.querySelector(".cart-icon");
 
-// FIX: use the correct selector — the bag icon now has class "cart-icon"
-const cartIcon = document.querySelector(".cart-icon");
+if (cartIcon) {
+  cartIcon.addEventListener("click", () => {
+    cartDrawer.classList.add("active");
+    cartOverlay.classList.add("active");
+  });
+}
 
-cartIcon.addEventListener("click", () => {
-  cartDrawer.classList.add("active");
-  cartOverlay.classList.add("active");
-});
+if (cartOverlay) {
+  cartOverlay.addEventListener("click", () => {
+    cartDrawer.classList.remove("active");
+    cartOverlay.classList.remove("active");
+  });
+}
 
-cartOverlay.addEventListener("click", () => {
-  cartDrawer.classList.remove("active");
-  cartOverlay.classList.remove("active");
-});
 
+// ===============================
+// 🟢 SEARCH
+// ===============================
 const searchBtn = document.getElementById("search_top");
 const searchOverlay = document.getElementById("searchOverlay");
 const searchInput = document.getElementById("searchInput");
 const searchClose = document.getElementById("searchClose");
 
-// OPEN SEARCH
-searchBtn.addEventListener("click", () => {
-  searchOverlay.classList.add("active");
-  searchInput.focus();
-});
-
-// CLOSE SEARCH
-function closeSearch() {
-  searchOverlay.classList.remove("active");
-  searchInput.value = "";
+if (searchBtn) {
+  searchBtn.addEventListener("click", () => {
+    searchOverlay.classList.add("active");
+    searchInput.focus();
+  });
 }
 
-// close button click
-searchClose.addEventListener("click", closeSearch);
+function closeSearch() {
+  if (searchOverlay) searchOverlay.classList.remove("active");
+  if (searchInput) searchInput.value = "";
+}
 
-// ENTER = SEARCH
-searchInput.addEventListener("keydown", (e) => {
- if (e.key === "Enter") {
-    const query = searchInput.value.trim();
-    if (query !== "") {
-      alert("Searching for: " + query); // replace with real logic
-    } 
-  } 
+if (searchClose) {
+  searchClose.addEventListener("click", closeSearch);
+}
+
+if (searchInput) {
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const query = searchInput.value.trim();
+      if (query !== "") {
+        alert("Searching for: " + query);
+      }
+    }
+  });
+}
 
 
+// ===============================
+// 🟢 GLOBAL ESC HANDLER
+// ===============================
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeSearch();
+
+    if (cartDrawer) cartDrawer.classList.remove("active");
+    if (cartOverlay) cartOverlay.classList.remove("active");
+
+    if (menu) menu.classList.remove("active");
+    if (overlay) overlay.classList.remove("active");
+
+    if (toggle) {
+      toggle.classList.add("fa-bars");
+      toggle.classList.remove("fa-times");
+    }
+  }
 });
 
-document.addEventListener("keydown", (e)=>{
-    if (e.key === "Escape" || e.key==="Esc") {
-    closeSearch();
-    cartDrawer.classList.remove("active");
-    cartOverlay.classList.remove("active");
-    menu.classList.remove("active");
-    overlay.classList.remove("active");
-    toggle.classList.add("fa-bars");
-    toggle.classList.remove("fa-times");
-  } 
-})
+
+// ===============================
+// 🟢 SCROLL ANIMATION
+// ===============================
 const reveals = document.querySelectorAll(".reveal");
 
 const observer = new IntersectionObserver((entries) => {
@@ -95,84 +125,66 @@ const observer = new IntersectionObserver((entries) => {
       entry.target.classList.add("active");
     }
   });
-}, {
-  threshold: 0.15
-});
+}, { threshold: 0.15 });
 
 reveals.forEach(el => observer.observe(el));
 
 
+// ===============================
+// 🟢 CART QTY (DRAWER ITEMS)
+// ===============================
 document.querySelectorAll(".cart-item").forEach(item => {
-
   const minus = item.querySelector(".minus");
-  const plus = item.querySelector(".plus");
+  const plus  = item.querySelector(".plus");
   const input = item.querySelector(".qty-input");
 
-  minus.addEventListener("click", () => {
-    let value = parseInt(input.value);
-    if (value > 1) input.value = value - 1;
-  });
+  if (minus && plus && input) {
+    minus.addEventListener("click", () => {
+      let val = parseInt(input.value);
+      if (val > 1) input.value = val - 1;
+    });
 
-  plus.addEventListener("click", () => {
-    let value = parseInt(input.value);
-    input.value = value + 1;
-  });
-
+    plus.addEventListener("click", () => {
+      input.value = parseInt(input.value) + 1;
+    });
+  }
 });
 
-// IMAGE SWITCH
+
+// ===============================
+// 🟢 IMAGE SWITCH (PRODUCT PAGE)
+// ===============================
 const mainImg = document.getElementById("mainImg");
-const thumbs = document.querySelectorAll(".thumb");
+const thumbs  = document.querySelectorAll(".thumb");
 
 thumbs.forEach(img => {
   img.addEventListener("click", () => {
-    mainImg.src = img.src;
+    if (mainImg) mainImg.src = img.src;
 
     thumbs.forEach(t => t.classList.remove("active"));
     img.classList.add("active");
   });
 });
 
-// QUANTITY
-const minus = document.querySelector(".minus");
-const plus = document.querySelector(".plus");
-const input = document.querySelector(".qty-box input");
 
-minus.addEventListener("click", () => {
-  let value = parseInt(input.value);
-  if (value > 1) input.value = value - 1;
-});
-
-plus.addEventListener("click", () => {
-  input.value = parseInt(input.value) + 1;
-});
-
-
+// ===============================
+// 🟢 CART ANIMATION (USED BY EJS)
+// ===============================
 const cartWrapper = document.querySelector(".cart-wrapper");
 
-
-
-// MAIN FUNCTION
 function addToCartAnimation() {
+  if (!cartIcon) return;
 
-  // 1. shake cart icon
   cartIcon.classList.add("cart-shake");
 
-  // 2. show red dot
-  cartWrapper.classList.add("active");
+  if (cartWrapper) {
+    cartWrapper.classList.add("active");
+  }
 
-  // 3. play sound
-  const sp = new Audio("/sounds/cart.mp3")
-  sp.play()
+  const sound = new Audio("/sounds/cart.mp3");
+  sound.play();
 
-  // remove shake after animation
   setTimeout(() => {
     cartIcon.classList.remove("cart-shake");
   }, 400);
 }
-
-document.querySelectorAll(".btn-cart").forEach(btn => {
-  btn.addEventListener("click", () => {
-    addToCartAnimation();
-  });
-});

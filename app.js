@@ -7,9 +7,11 @@ import { fileURLToPath } from "url";
 import authRoutes from "./routes/authRoutes.js";
 import pageRoutes from "./routes/pageRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { cartMiddleware } from "./middleware/cartMiddleware.js";
+import { attachCart } from "./middleware/cartData.js";
 
 dotenv.config();
 
@@ -31,6 +33,7 @@ app.use(cookieParser());
   
   app.use(authMiddleware);
   app.use(cartMiddleware);
+  app.use(attachCart)
   
   
   
@@ -44,6 +47,8 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/", pageRoutes);
 app.use("/cart", cartRoutes);
+app.use("/order", orderRoutes);
+
 
 // 🎨 view engine
 app.set("view engine", "ejs");

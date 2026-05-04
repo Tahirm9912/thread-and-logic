@@ -86,3 +86,35 @@ document.querySelectorAll(".cart-item").forEach(item => {
 });
 
 
+
+function toggleEdit() {
+  document.getElementById("viewMode").style.display = "none";
+  document.getElementById("editForm").style.display = "grid";
+}
+
+function updateProfile(e) {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+
+  fetch("/user/update", {
+    method: "POST",
+    body: JSON.stringify({
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      address: formData.get("address")
+    }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("Updated!");
+      location.reload();
+    }
+  });
+}
+
+
