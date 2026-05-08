@@ -1,0 +1,479 @@
+/* =========================
+   STATS CARDS
+========================= */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e9e9e9;
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-card i {
+  font-size: 20px;
+  color: #4a6cf7;
+}
+
+.stat-card h3 {
+  font-size: 18px;
+  margin-bottom: 3px;
+}
+
+/* =========================
+   TABLES
+========================= */
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e6e6e6;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 13px;
+  border-bottom: 1px solid #eee;
+}
+
+.admin-table th {
+  background: #f9fafc;
+  font-weight: 600;
+  color: #555;
+}
+
+.admin-table tr:hover {
+  background: #fafbff;
+}
+
+.admin-table img {
+  border-radius: 6px;
+}
+
+/* =========================
+   STATUS BADGES
+========================= */
+
+.status {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.status.active {
+  background: #e6f6ea;
+  color: #2e7d32;
+}
+
+.status.inactive {
+  background: #fdeaea;
+  color: #c62828;
+}
+
+/* order statuses */
+
+.status.pending { background: #fff3cd; color: #8a6d3b; }
+.status.processing { background: #e3f2fd; color: #1565c0; }
+.status.shipped { background: #e0f2f1; color: #00695c; }
+.status.delivered { background: #e8f5e9; color: #2e7d32; }
+.status.cancelled { background: #fdecea; color: #c62828; }
+
+/* =========================
+   FORMS (settings + product)
+========================= */
+
+form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e6e6e6;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #4a6cf7;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* =========================
+   BADGES (users)
+========================= */
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.badge.admin {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.badge.user {
+  background: #f1f1f1;
+  color: #555;
+}
+
+
+/* =========================
+   PRODUCT FORM PAGE
+========================= */
+
+.product-form {
+  max-width: 950px;
+}
+
+/* =========================
+   FORM SECTIONS
+========================= */
+
+.form-section {
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  border: 1px solid #e8e8e8;
+}
+
+.form-section h2 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #555;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  transition: 0.2s;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #4a6cf7;
+  outline: none;
+}
+
+/* helper text */
+.form-group small {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+  display: block;
+}
+
+/* =========================
+   ROW LAYOUT
+========================= */
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+/* =========================
+   VARIANTS
+========================= */
+
+.variant-item {
+  background: #fafafa;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.variant-item h4 {
+  font-size: 14px;
+  margin-bottom: 12px;
+  color: #444;
+}
+
+/* =========================
+   CHECKBOX GROUP
+========================= */
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #444;
+  cursor: pointer;
+}
+
+.checkbox-group input {
+  width: 16px;
+  height: 16px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-primary,
+.btn-secondary {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.2s;
+}
+
+.btn-primary {
+  background: #4a6cf7;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #3b5de7;
+}
+
+.btn-secondary {
+  background: #eef0f6;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background: #e3e6ef;
+}
+
+/* =========================
+   FORM ACTIONS
+========================= */
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .form-section {
+    padding: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}
+
+/* =========================
+   ORDER DETAIL PAGE
+========================= */
+
+.order-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+/* =========================
+   DETAIL CARDS
+========================= */
+
+.detail-card {
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.detail-card h3 {
+  font-size: 15px;
+  margin-bottom: 14px;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+/* =========================
+   ROWS
+========================= */
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f1f1;
+  font-size: 13px;
+  color: #444;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row strong {
+  color: #666;
+  font-weight: 500;
+}
+
+/* =========================
+   SELECT (STATUS)
+========================= */
+
+.status-select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #fff;
+}
+
+/* =========================
+   HEADER ACTIONS
+========================= */
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* =========================
+   TABLE CLEAN STYLE (override if needed)
+========================= */
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e6e6e6;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 13px;
+  border-bottom: 1px solid #eee;
+}
+
+.admin-table th {
+  background: #f8f9fb;
+  color: #555;
+  font-weight: 600;
+}
+
+.admin-table tr:hover {
+  background: #fafbff;
+}
+
+.admin-table img {
+  border-radius: 6px;
+}
+
+/* =========================
+   PRINT MODE
+========================= */
+
+@media print {
+  .admin-header,
+  .admin-sidebar,
+  .header-actions,
+  .btn-primary,
+  .btn-secondary {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .admin-main {
+    padding: 0;
+    margin: 0;
+  }
+
+  .detail-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}

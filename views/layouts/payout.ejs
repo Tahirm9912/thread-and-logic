@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Now!</title>
-    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+    <title>Payment - aynByHadiyaz</title>
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="../css/payout.css">
+    <link rel="stylesheet" href="/css/payout.css">
+    <link rel="stylesheet" href="/css/main.css">
+
 </head>
 
 <body>
 
-<!-- NAVBAR -->
- <%- include('../partials/header-nscm') %>
+<%- include('../partials/header-nscm') %>
 
-<!-- PAYOUT -->
- <section class="payment-page">
+<section class="payment-page">
 
   <h2 class="payment-title">Payment</h2>
 
@@ -26,20 +26,20 @@
 
       <h3>Select Payment Method</h3>
 
-<label class="pay-option">
-  <input type="radio" name="pay" value="cod" checked>
-  Cash on Delivery
-</label>
+      <label class="pay-option">
+        <input type="radio" name="pay" value="COD" checked>
+        Cash on Delivery
+      </label>
 
-<label class="pay-option">
-  <input type="radio" name="pay" value="easypaisa">
-  Easypaisa
-</label>
-<div id="qrBox" style="display:none; margin-top:20px;">
-  <p>Scan QR & pay via Easypaisa</p>
-  <img src="/images/qr.png" width="200">
-</div>
+      <label class="pay-option">
+        <input type="radio" name="pay" value="easypaisa">
+        Easypaisa
+      </label>
 
+      <div id="qrBox" style="display:none; margin-top:20px;">
+        <p>Scan QR & pay via Easypaisa</p>
+        <img src="/images/qrCode.jpg" width="200" alt="QR Code">
+      </div>
 
     </div>
 
@@ -50,7 +50,7 @@
 
       <div class="summary-item">
         <span>Subtotal</span>
-        <span>Rs 4500</span>
+        <span>Rs <%= order ? parseFloat(order.total_amount).toFixed(0) : 0 %></span>
       </div>
 
       <div class="summary-item">
@@ -62,12 +62,12 @@
 
       <div class="summary-total">
         <span>Total</span>
-        <span>Rs 4700</span>
+        <span>Rs <%= order ? (parseFloat(order.total_amount) + 200).toFixed(0) : 200 %></span>
       </div>
 
-      <button onclick="confirmOrder()" class="pay-btn">
-  Confirm Order
-</button>
+      <button onclick="confirmOrder(<%= order ? order.id : 0 %>)" class="pay-btn">
+        Confirm Order
+      </button>
 
     </div>
 
@@ -75,13 +75,11 @@
 
 </section>
 
+<%- include('../partials/menubar') %>
+<%- include('../partials/cart') %>
+<%- include('../partials/footer') %>
 
+<script src="/js/payout.js"></script>
 
-
-
-
-
-
-<script src="../js/payout.js"></script>
 </body>
 </html>

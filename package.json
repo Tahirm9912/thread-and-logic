@@ -1,14 +1,16 @@
 {
-  "name": "velmore",
+  "name": "velmora-ecommerce",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "",
-  "type": "module",
+  "description": "E-commerce platform for Pakistani fashion",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
+  "keywords": ["ecommerce", "fashion", "nodejs", "express"],
+  "author": "Your Name",
+  "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.2",
@@ -19,5 +21,8 @@
     "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }

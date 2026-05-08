@@ -1,10 +1,14 @@
 import pool from "../config/db.js";
 
+// ==========================
+// 🛒 ATTACH CART DATA (runs on every request)
+// ==========================
 export const attachCart = async (req, res, next) => {
   try {
     // if user not logged in → empty cart
     if (!req.user) {
       res.locals.items = [];
+      res.locals.cartCount = 0;
       return next();
     }
 
@@ -17,12 +21,15 @@ export const attachCart = async (req, res, next) => {
 
     if (cart.rows.length === 0) {
       res.locals.items = [];
+      res.locals.cartCount = 0;
       return next();
     }
 
     const items = await pool.query(
       `SELECT 
+        ci.id,
         ci.quantity,
+        p.productid,
         p.name,
         p.price,
         pv.size,
@@ -37,14 +44,16 @@ export const attachCart = async (req, res, next) => {
       [cart.rows[0].id]
     );
 
-    // 🔥 THIS MAKES IT AVAILABLE EVERYWHERE
+    // make cart data available everywhere
     res.locals.items = items.rows;
+    res.locals.cartCount = items.rows.reduce((sum, item) => sum + item.quantity, 0);
 
     next();
 
   } catch (err) {
-    console.log(err);
+    console.error("Cart middleware error:", err);
     res.locals.items = [];
+    res.locals.cartCount = 0;
     next();
   }
 };

@@ -1,16 +1,22 @@
 import express from "express";
-import { addToCart, getCartItems, updateCartItem, removeCartItem } from "../controllers/cartController.js";
-import { protectPage } from "../middleware/authPage.js";
-import { createOrder, confirmOrder } from "../controllers/orderControlller.js";
+import { requireAuth } from "../middleware/authMiddleware.js";
+import { 
+  addToCart, 
+  getCartItems, 
+  updateCartItem, 
+  removeCartItem,
+  clearCart 
+} from "../controllers/cartController.js";
 
 const router = express.Router();
 
-router.post("/add", protectPage, addToCart);
-router.get("/", protectPage, getCartItems);
-router.post("/update", protectPage, updateCartItem);
-router.post("/remove", protectPage, removeCartItem);
-// router.post("/checkout/select", protectPage, saveSelectedItems);
-router.post("/order/create", protectPage, createOrder);
-router.post("/order/confirm", protectPage, confirmOrder);
+// all cart routes require authentication
+router.use(requireAuth);
+
+router.post("/add", addToCart);
+router.get("/", getCartItems);
+router.post("/update", updateCartItem);
+router.post("/remove", removeCartItem);
+router.post("/clear", clearCart);
 
 export default router;

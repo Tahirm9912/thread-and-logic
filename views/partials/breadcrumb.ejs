@@ -1,0 +1,51 @@
+<% if (typeof breadcrumbs !== 'undefined' && breadcrumbs && breadcrumbs.length > 0) { %>
+<nav class="breadcrumb">
+  <% breadcrumbs.forEach((crumb, index) => { %>
+    <% if (index === breadcrumbs.length - 1) { %>
+      <span class="breadcrumb-current"><%= crumb.name %></span>
+    <% } else { %>
+      <a href="<%= crumb.url %>"><%= crumb.name %></a>
+      <i class="fas fa-chevron-right"></i>
+    <% } %>
+  <% }) %>
+</nav>
+<% } %>
+
+<style>
+.breadcrumb {
+  margin-top: 70px;
+  padding: 1rem 2rem;
+  background: #f9f9f9;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.breadcrumb a {
+  color: #666;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.breadcrumb a:hover {
+  color: #1a1a1a;
+}
+
+.breadcrumb i {
+  color: #ccc;
+  font-size: 0.7rem;
+}
+
+.breadcrumb-current {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .breadcrumb {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+</style>

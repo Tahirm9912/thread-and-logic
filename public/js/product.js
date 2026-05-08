@@ -188,3 +188,23 @@ function addToCartAnimation() {
     cartIcon.classList.remove("cart-shake");
   }, 400);
 }
+
+// Track recently viewed
+function trackRecentlyViewed(productId) {
+  let recent = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+  
+  // Remove if already exists
+  recent = recent.filter(id => id !== productId);
+  
+  // Add to front
+  recent.unshift(productId);
+  
+  // Keep only last 10
+  recent = recent.slice(0, 10);
+  
+  localStorage.setItem('recentlyViewed', JSON.stringify(recent));
+}
+
+// Call when page loads
+const productId = <%= product.productid %>;
+trackRecentlyViewed(productId);

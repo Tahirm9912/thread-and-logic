@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Product</title>
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin-main.css">
+</head>
+<body>
+
+<%- include('../../partials/admin-header') %>
+
+
+<div class="admin-container">
+  
+  <%- include('../../partials/admin-sidebar') %>
+
+  <main class="admin-main">
+    
+    <h1>Add New Product</h1>
+
+    <form action="/admin/products/add" method="POST" class="product-form">
+
+      <section class="form-section">
+        <h2>Basic Information</h2>
+
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" name="name" required placeholder="e.g., Lawn Summer Collection">
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="4" placeholder="Product description..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category">
+              <option value="Women">Women</option>
+              <option value="Men">Men</option>
+              <option value="Kids">Kids</option>
+              <option value="Accessories">Accessories</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Base Price (Rs) *</label>
+            <input type="number" name="price" required placeholder="3500" step="0.01">
+          </div>
+
+          <div class="form-group">
+            <label>Stock Quantity</label>
+            <input type="number" name="stock" placeholder="50" value="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Tags (comma separated)</label>
+          <input type="text" name="tags" placeholder="summer, lawn, new">
+          <small>e.g., new, summer, formal, casual, sale</small>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h2>Product Images</h2>
+        
+        <div id="imagesContainer">
+          <div class="form-group">
+            <label>Image URL 1 (Primary)</label>
+            <input type="text" name="images[]" placeholder="/images/product1.jpg">
+          </div>
+        </div>
+
+        <button type="button" onclick="addImageField()" class="btn-secondary">
+          <i class="fas fa-plus"></i> Add More Images
+        </button>
+      </section>
+
+      <section class="form-section">
+        <h2>Product Variants</h2>
+        
+        <div id="variantsContainer">
+          <div class="variant-item">
+            <h4>Variant 1</h4>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Size</label>
+                <input type="text" name="variants[0][size]" placeholder="M">
+              </div>
+
+              <div class="form-group">
+                <label>Color</label>
+                <input type="text" name="variants[0][color]" placeholder="Blue">
+              </div>
+
+              <div class="form-group">
+                <label>Fabric</label>
+                <input type="text" name="variants[0][fabric]" placeholder="Lawn">
+              </div>
+
+              <div class="form-group">
+                <label>Piece Type</label>
+                <input type="text" name="variants[0][piece_type]" placeholder="3 Piece">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Stock</label>
+                <input type="number" name="variants[0][stock]" placeholder="20" value="0">
+              </div>
+
+              <div class="form-group">
+                <label>Price (Rs)</label>
+                <input type="number" name="variants[0][price]" placeholder="3500" step="0.01">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" onclick="addVariantField()" class="btn-secondary">
+          <i class="fas fa-plus"></i> Add Variant
+        </button>
+      </section>
+
+      <section class="form-section">
+        <h2>Options</h2>
+
+        <div class="checkbox-group">
+          <label>
+            <input type="checkbox" name="is_active" checked>
+            <span>Active</span>
+          </label>
+
+          <label>
+            <input type="checkbox" name="is_trending">
+            <span>Trending</span>
+          </label>
+
+          <label>
+            <input type="checkbox" name="is_featured">
+            <span>Featured</span>
+          </label>
+
+          <label>
+            <input type="checkbox" name="is_top">
+            <span>Top Product</span>
+          </label>
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Create Product
+        </button>
+        <a href="/admin/products" class="btn-secondary">Cancel</a>
+      </div>
+
+    </form>
+
+  </main>
+
+</div>
+
+<style>
+.product-form {
+  max-width: 900px;
+}
+
+.form-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-section h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-group small {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.variant-item {
+  border: 1px solid #e0e0e0;
+  padding: 1.5rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  background: #fafafa;
+}
+
+.variant-item h4 {
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+</style>
+
+<script>
+let imageCount = 1;
+let variantCount = 1;
+
+function addImageField() {
+  imageCount++;
+  const container = document.getElementById('imagesContainer');
+  const div = document.createElement('div');
+  div.className = 'form-group';
+  div.innerHTML = `
+    <label>Image URL ${imageCount}</label>
+    <input type="text" name="images[]" placeholder="/images/product${imageCount}.jpg">
+  `;
+  container.appendChild(div);
+}
+
+function addVariantField() {
+  const container = document.getElementById('variantsContainer');
+  const div = document.createElement('div');
+  div.className = 'variant-item';
+  div.innerHTML = `
+    <h4>Variant ${variantCount + 1}</h4>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label>Size</label>
+        <input type="text" name="variants[${variantCount}][size]" placeholder="M">
+      </div>
+
+      <div class="form-group">
+        <label>Color</label>
+        <input type="text" name="variants[${variantCount}][color]" placeholder="Blue">
+      </div>
+
+      <div class="form-group">
+        <label>Fabric</label>
+        <input type="text" name="variants[${variantCount}][fabric]" placeholder="Lawn">
+      </div>
+
+      <div class="form-group">
+        <label>Piece Type</label>
+        <input type="text" name="variants[${variantCount}][piece_type]" placeholder="3 Piece">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Stock</label>
+        <input type="number" name="variants[${variantCount}][stock]" placeholder="20" value="0">
+      </div>
+
+      <div class="form-group">
+        <label>Price (Rs)</label>
+        <input type="number" name="variants[${variantCount}][price]" placeholder="3500" step="0.01">
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  variantCount++;
+}
+</script>
+
+</body>
+</html>

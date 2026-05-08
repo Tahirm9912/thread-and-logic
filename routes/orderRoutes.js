@@ -1,10 +1,13 @@
 import express from "express";
-import { createOrder, confirmOrder } from "../controllers/orderControlller.js";
-import { protectPage } from "../middleware/authPage.js";
+import { requireAuth } from "../middleware/authMiddleware.js";
+import { createOrder, confirmOrder } from "../controllers/orderController.js";
 
 const router = express.Router();
 
-router.post("/create", protectPage, createOrder);
-router.post("/order/confirm", protectPage, confirmOrder);
+// all order routes require authentication
+router.use(requireAuth);
+
+router.post("/create", createOrder);
+router.post("/confirm", confirmOrder);
 
 export default router;

@@ -1,0 +1,273 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap');
+
+:root{
+  --primary:#6b4f3b;
+  --dark:#2c2c2c;
+  --light:#ffffff;
+  --bg:#f6f6f6;
+  --border:#e8e8e8;
+  --shadow:0 10px 30px rgba(0,0,0,0.08);
+  --radius:12px;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Jost",sans-serif;
+}
+
+body{
+  background:var(--bg);
+  color:var(--dark);
+}
+
+/* ================= PAGE WRAPPER ================= */
+.order-detail-page{
+  padding:100px 20px 50px;
+}
+
+.order-container{
+  max-width:1000px;
+  margin:auto;
+  background:white;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:25px;
+}
+
+/* ================= HEADER ================= */
+.order-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+  border-bottom:1px solid var(--border);
+  padding-bottom:15px;
+  margin-bottom:20px;
+}
+
+.order-header h1{
+  font-size:22px;
+  color:var(--dark);
+}
+
+.order-date{
+  font-size:14px;
+  color:#777;
+  margin-top:5px;
+}
+
+.header-right{
+  display:flex;
+  gap:10px;
+}
+
+/* ================= BUTTONS ================= */
+.btn-print,
+.btn-back{
+  padding:10px 14px;
+  border-radius:8px;
+  border:none;
+  font-size:14px;
+  cursor:pointer;
+  text-decoration:none;
+  transition:0.3s;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
+.btn-print{
+  background:var(--primary);
+  color:white;
+}
+
+.btn-print:hover{
+  opacity:0.9;
+}
+
+.btn-back{
+  background:#f2f2f2;
+  color:var(--dark);
+}
+
+.btn-back:hover{
+  background:#e8e8e8;
+}
+
+/* ================= STATUS ================= */
+.order-status{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:15px;
+  padding:15px;
+  background:#fafafa;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  margin-bottom:25px;
+}
+
+.status-item strong{
+  display:block;
+  font-size:13px;
+  color:#777;
+  margin-bottom:5px;
+}
+
+/* STATUS BADGES */
+.status-badge{
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+  display:inline-block;
+}
+
+.status-badge.pending{
+  background:#fff3cd;
+  color:#856404;
+}
+
+.status-badge.processing{
+  background:#cfe2ff;
+  color:#084298;
+}
+
+.status-badge.shipped{
+  background:#d1ecf1;
+  color:#0c5460;
+}
+
+.status-badge.delivered{
+  background:#d4edda;
+  color:#155724;
+}
+
+.status-badge.cancelled{
+  background:#f8d7da;
+  color:#721c24;
+}
+
+/* ================= INFO SECTION ================= */
+.info-section{
+  margin-bottom:25px;
+}
+
+.info-section h2{
+  font-size:18px;
+  margin-bottom:15px;
+}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;
+}
+
+.info-grid div{
+  background:#fafafa;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:8px;
+}
+
+.info-grid strong{
+  display:block;
+  font-size:12px;
+  color:#777;
+  margin-bottom:5px;
+}
+
+/* ================= TABLE ================= */
+.items-section h2{
+  font-size:18px;
+  margin-bottom:15px;
+}
+
+.order-table{
+  width:100%;
+  border-collapse:collapse;
+  overflow:hidden;
+  border-radius:10px;
+}
+
+.order-table th{
+  background:#f5f5f5;
+  text-align:left;
+  padding:12px;
+  font-size:13px;
+}
+
+.order-table td{
+  padding:12px;
+  border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+
+.order-table img{
+  width:55px;
+  height:65px;
+  object-fit:cover;
+  border-radius:6px;
+}
+
+/* ================= TOTALS ================= */
+.totals-section{
+  margin-top:20px;
+  padding-top:15px;
+  border-top:1px solid var(--border);
+}
+
+.total-row{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  font-size:14px;
+}
+
+.grand-total{
+  font-size:16px;
+  font-weight:600;
+  color:var(--primary);
+}
+
+/* ================= PRINT MODE ================= */
+@media print{
+
+  body{
+    background:white;
+  }
+
+  .no-print{
+    display:none !important;
+  }
+
+  .order-container{
+    box-shadow:none;
+    border:none;
+    padding:0;
+  }
+
+  .order-detail-page{
+    padding:0;
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+@media(max-width:768px){
+  .order-header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .header-right{
+    width:100%;
+    justify-content:flex-start;
+  }
+
+  .order-table{
+    font-size:12px;
+  }
+}

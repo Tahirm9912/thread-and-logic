@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Now!</title>
-    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+    <title>Sign Up - aynByHadiyaz</title>
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     <link rel="stylesheet" href="/css/signup.css">
+    <link rel="stylesheet" href="/css/main.css">
+
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <%- include("../partials/header-nscm") %>
 
 <section class="auth-section">
@@ -41,77 +41,69 @@
         <input name="tel" type="tel" placeholder="03XXXXXXXXX" required>
       </div>
 
-            <!-- ADDRESS -->
+      <!-- ADDRESS -->
       <div class="form-group">
         <label>Address</label>
-        <textarea name="address" type="text" placeholder="Enter Your Complete Address" required></textarea>
+        <textarea name="address" placeholder="Enter your complete address" required></textarea>
       </div>
 
-
-          <!-- POSTAL CODE -->
+      <!-- POSTAL CODE -->
       <div class="form-group">
         <label>Postal Code</label>
-        <input name="postal_code" type="number"  placeholder="49500" required>
+        <input name="postal_code" type="text" placeholder="49500" required>
       </div>
 
       <!-- PASSWORD -->
       <div class="form-group">
         <label>Password</label>
-        <input name="password" type="password" placeholder="Enter password" minlength="8" required>
+        <input name="password" type="password" placeholder="Enter password (min 8 characters)" minlength="8" required>
       </div>
 
       <!-- CHECKBOXES -->
       <div class="form-check">
-  <label>
-    <input type="checkbox" required>
-    I agree to 
-    <a href="/terms-and-conditions" class="link">Terms & Conditions</a>
-  </label>
-</div>
+        <label>
+          <input type="checkbox" required>
+          I agree to <a href="/terms-and-conditions" class="link">Terms & Conditions</a>
+        </label>
+      </div>
 
       <div class="form-check">
         <label>
-          <input name="allow_permissions" type="checkbox">
+          <input name="allow_promotions" type="checkbox">
           Receive promotional messages
         </label>
       </div>
 
       <!-- BUTTON -->
-      <button type="submit" class="auth-btn">
-        Create Account
-      </button>
+      <button type="submit" class="auth-btn">Create Account</button>
 
-<% if (error) { %>
-  <div class="auth-message" id="notification_pan">
-    <div class="message error">
-      <%= error %>
-    </div>
-  </div>
-<% } %>
+      <% if (error) { %>
+        <div class="auth-message" id="notification_pan">
+          <div class="message error">
+            <%= error %>
+          </div>
+        </div>
+      <% } %>
 
     </form>
-    
-
-
 
     <p class="auth-switch">
-  Already have an account? 
-  <a href="/login">Sign In</a>
-</p>
+      Already have an account? 
+      <a href="/login">Sign In</a>
+    </p>
 
   </div>
 
 </section>
 
-
 <script>
   const pan = document.getElementById("notification_pan");
-
   if (pan) {
     setTimeout(() => {
       pan.classList.add("hidden");
-    }, 3000); // 3 seconds
+    }, 3000);
   }
 </script>
+
 </body>
 </html>

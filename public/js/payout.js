@@ -1,57 +1,70 @@
-  // ─── SIDE MENU ────────────────────────────────────────────────────────
-const menu     = document.getElementById("sideMenu");
-const overlay  = document.getElementById("overlay");
-const toggle   = document.getElementById("menuToggle");
+// ─── SIDE MENU ────────────────────────────────────────────────────────
+const menu = document.getElementById("sideMenu");
+const overlay = document.getElementById("overlay");
+const toggle = document.getElementById("menuToggle");
 
-toggle.addEventListener("click", () => {
-  menu.classList.toggle("active");
-  overlay.classList.toggle("active");
-  toggle.classList.toggle("fa-bars");
-  toggle.classList.toggle("fa-times");
-});
-
-overlay.addEventListener("click", () => {
-  menu.classList.remove("active");
-  overlay.classList.remove("active");
-  toggle.classList.add("fa-bars");
-  toggle.classList.remove("fa-times");
-});
-
-// dropdowns inside side menu
-document.querySelectorAll(".dropdown").forEach(d => {
-  d.querySelector(".drop-btn").addEventListener("click", (e) => {
-    e.stopPropagation();
-    d.classList.toggle("active");
+if (toggle) {
+  toggle.addEventListener("click", () => {
+    menu.classList.toggle("active");
+    overlay.classList.toggle("active");
+    toggle.classList.toggle("fa-bars");
+    toggle.classList.toggle("fa-times");
   });
-});
+}
 
-// ─── CART DRAWER ──────────────────────────────────────────────────────
-const cartDrawer  = document.getElementById("cartDrawer");
-const cartOverlay = document.getElementById("cartOverlay");
-
-// FIX: use the correct selector — the bag icon now has class "cart-icon"
-const cartIcon = document.querySelector(".cart-icon");
-
-cartIcon.addEventListener("click", () => {
-  cartDrawer.classList.add("active");
-  cartOverlay.classList.add("active");
-});
-
-cartOverlay.addEventListener("click", () => {
-  cartDrawer.classList.remove("active");
-  cartOverlay.classList.remove("active");
-});
-
-document.addEventListener("keydown", (e)=>{
-    if (e.key === "Escape" || e.key==="Esc") {
-    cartDrawer.classList.remove("active");
-    cartOverlay.classList.remove("active");
+if (overlay) {
+  overlay.addEventListener("click", () => {
     menu.classList.remove("active");
     overlay.classList.remove("active");
     toggle.classList.add("fa-bars");
     toggle.classList.remove("fa-times");
-  } 
-})
+  });
+}
+
+document.querySelectorAll(".dropdown").forEach(d => {
+  const btn = d.querySelector(".drop-btn");
+  if (btn) {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      d.classList.toggle("active");
+    });
+  }
+});
+
+// ─── CART DRAWER ──────────────────────────────────────────────────────
+const cartDrawer = document.getElementById("cartDrawer");
+const cartOverlay = document.getElementById("cartOverlay");
+const cartIcon = document.querySelector(".cart-icon");
+
+if (cartIcon) {
+  cartIcon.addEventListener("click", () => {
+    cartDrawer.classList.add("active");
+    cartOverlay.classList.add("active");
+  });
+}
+
+if (cartOverlay) {
+  cartOverlay.addEventListener("click", () => {
+    cartDrawer.classList.remove("active");
+    cartOverlay.classList.remove("active");
+  });
+}
+
+// ─── ESCAPE KEY ───────────────────────────────────────────────────────
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" || e.key === "Esc") {
+    if (cartDrawer) cartDrawer.classList.remove("active");
+    if (cartOverlay) cartOverlay.classList.remove("active");
+    if (menu) menu.classList.remove("active");
+    if (overlay) overlay.classList.remove("active");
+    if (toggle) {
+      toggle.classList.add("fa-bars");
+      toggle.classList.remove("fa-times");
+    }
+  }
+});
+
+// ─── SCROLL REVEAL ────────────────────────────────────────────────────
 const reveals = document.querySelectorAll(".reveal");
 
 const observer = new IntersectionObserver((entries) => {
@@ -60,121 +73,74 @@ const observer = new IntersectionObserver((entries) => {
       entry.target.classList.add("active");
     }
   });
-}, {
-  threshold: 0.15
-});
+}, { threshold: 0.15 });
 
 reveals.forEach(el => observer.observe(el));
 
-
+// ─── CART QTY CONTROLS ────────────────────────────────────────────────
 document.querySelectorAll(".cart-item").forEach(item => {
-
   const minus = item.querySelector(".minus");
   const plus = item.querySelector(".plus");
   const input = item.querySelector(".qty-input");
 
-  minus.addEventListener("click", () => {
-    let value = parseInt(input.value);
-    if (value > 1) input.value = value - 1;
-  });
+  if (minus && plus && input) {
+    minus.addEventListener("click", () => {
+      let value = parseInt(input.value);
+      if (value > 1) input.value = value - 1;
+    });
 
-  plus.addEventListener("click", () => {
-    let value = parseInt(input.value);
-    input.value = value + 1;
-  });
-
+    plus.addEventListener("click", () => {
+      let value = parseInt(input.value);
+      input.value = value + 1;
+    });
+  }
 });
 
+// ─── PAYMENT METHOD TOGGLE ────────────────────────────────────────────
+const radios = document.querySelectorAll('input[name="pay"]');
+const qrBox = document.getElementById("qrBox");
 
-
-function confirmOrder() {
-  const method = document.querySelector('input[name="pay"]:checked').value;
-
-  fetch("/order/confirm", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ method })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      alert("Order placed successfully!");
-
-      // redirect to account page
-      window.location.href = "/account";
-    } else {
-      alert(data.message || "Failed");
-    }
-  })
-  .catch(err => {
-    console.log(err);
-    alert("Error placing order");
+if (radios.length > 0 && qrBox) {
+  radios.forEach(r => {
+    r.addEventListener("change", () => {
+      if (r.value === "easypaisa" && r.checked) {
+        qrBox.style.display = "block";
+      } else {
+        qrBox.style.display = "none";
+      }
+    });
   });
 }
 
-
-function confirmOrder() {
-  const method = document.querySelector('input[name="pay"]:checked').value;
-
-  fetch("/order/confirm", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ method })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      alert("Order placed successfully!");
-
-      // redirect to account page
-      window.location.href = "/account";
-    } else {
-      alert(data.message || "Failed");
-    }
-  })
-  .catch(err => {
-    console.log(err);
-    alert("Error placing order");
-  });
-}
-
-
-function goToPayout() {
-  const selected = [];
-
-  document.querySelectorAll(".item-select:checked").forEach(cb => {
-    selected.push(parseInt(cb.value));
-  });
-
-  if (selected.length === 0) {
-    alert("Select at least one item");
+// ─── CONFIRM ORDER ────────────────────────────────────────────────────
+function confirmOrder(orderId) {
+  const methodRadio = document.querySelector('input[name="pay"]:checked');
+  
+  if (!methodRadio) {
+    alert("Please select a payment method");
     return;
   }
 
-  // 🔥 SEND TO BACKEND
-  fetch("/order/create", {
+  const method = methodRadio.value;
+
+  fetch("/order/confirm", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      selectedItems: selected
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ orderId, method })
   })
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      window.location.href = "/payout";
+      alert("Order placed successfully!");
+      window.location.href = "/account";
     } else {
-      alert(data.message);
+      alert(data.message || "Failed to place order");
     }
   })
   .catch(err => {
-    console.log(err);
-    alert("Error");
+    console.error(err);
+    alert("Error placing order");
   });
 }
+
+window.confirmOrder = confirmOrder;

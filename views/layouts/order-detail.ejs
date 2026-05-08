@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order #<%= order.id %> - aynByHadiyaz</title>
+  <link rel="stylesheet" href="/css/order-detail.css">
+    <link rel="stylesheet" href="/css/main.css">
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="no-print">
+  <%- include('../partials/header-nscm') %>
+  <%- include("../partials/breadcrumb") %>
+
+</div>
+
+<div class="order-detail-page">
+
+  <div class="order-container">
+
+    <!-- HEADER -->
+    <div class="order-header">
+      <div class="header-left">
+        <h1>Order #<%= order.id %></h1>
+        <p class="order-date">Placed on <%= new Date(order.created_at).toLocaleDateString() %></p>
+      </div>
+      <div class="header-right no-print">
+        <button onclick="window.print()" class="btn-print">
+          <i class="fas fa-print"></i> Print Order
+        </button>
+        <a href="/account" class="btn-back">Back to Orders</a>
+      </div>
+    </div>
+
+    <!-- STATUS -->
+    <div class="order-status">
+      <div class="status-item">
+        <strong>Status:</strong>
+        <span class="status-badge <%= order.status %>">
+          <%= order.status.replace(/_/g, ' ').toUpperCase() %>
+        </span>
+      </div>
+      <div class="status-item">
+        <strong>Payment Method:</strong>
+        <span><%= order.payment_method || 'N/A' %></span>
+      </div>
+      <div class="status-item">
+        <strong>Payment Status:</strong>
+        <span><%= order.payment_status %></span>
+      </div>
+    </div>
+
+    <!-- CUSTOMER INFO -->
+    <div class="info-section">
+      <h2>Customer Information</h2>
+      <div class="info-grid">
+        <div>
+          <strong>Name:</strong>
+          <span><%= user.name %></span>
+        </div>
+        <div>
+          <strong>Email:</strong>
+          <span><%= user.email %></span>
+        </div>
+        <div>
+          <strong>Phone:</strong>
+          <span><%= user.tel || 'N/A' %></span>
+        </div>
+        <div>
+          <strong>Address:</strong>
+          <span><%= user.address || 'N/A' %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDER ITEMS -->
+    <div class="items-section">
+      <h2>Order Items</h2>
+      
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% items.forEach(item => { %>
+            <tr>
+              <td>
+                <img src="<%= item.image_url || '/images/default.jpg' %>" width="60" alt="<%= item.name %>">
+              </td>
+              <td><%= item.name %></td>
+              <td><%= item.quantity %></td>
+              <td>Rs <%= parseFloat(item.price).toFixed(0) %></td>
+              <td>Rs <%= (parseFloat(item.price) * item.quantity).toFixed(0) %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TOTALS -->
+    <div class="totals-section">
+      <div class="total-row">
+        <span>Subtotal:</span>
+        <span>Rs <%= parseFloat(order.total_amount).toFixed(0) %></span>
+      </div>
+      <div class="total-row">
+        <span>Delivery:</span>
+        <span>Rs 200</span>
+      </div>
+      <div class="total-row grand-total">
+        <span>Grand Total:</span>
+        <span>Rs <%= (parseFloat(order.total_amount) + 200).toFixed(0) %></span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="no-print">
+  <%- include('../partials/footer') %>
+</div>
+
+</body>
+</html>

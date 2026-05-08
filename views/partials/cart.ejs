@@ -1,62 +1,52 @@
-<% const safeItems = items || [] %>
-
+<!-- CART DRAWER -->
 <div class="cart-overlay" id="cartOverlay"></div>
 
 <aside class="cart-drawer" id="cartDrawer">
+  
+  <div class="cart-header">
+    <h3>Shopping Cart</h3>
+    <i class="fas fa-times cart-close"></i>
+  </div>
 
-  <h3 class="cart-title">Your Cart</h3>
+  <div class="cart-body">
 
-  <% if (safeItems.length === 0) { %>
+    <% if (items && items.length > 0) { %>
 
-    <p class="empty">Cart is empty</p>
+      <% items.forEach(item => { %>
+        
+        <div class="cart-item">
+          
+          <img src="<%= item.image_url || '/images/default.jpg' %>" alt="<%= item.name %>">
+          
+          <div class="cart-item-info">
+            <h4><%= item.name %></h4>
+            <p><%= item.size %> • <%= item.color %></p>
+            <p class="cart-price">Rs <%= item.price %></p>
+          </div>
 
-  <% } else { %>
-
-    <% safeItems.forEach(item => { %>
-
-      <div class="cart-item">
-
-        <input type="checkbox" class="cart-check">
-
-        <img src="<%= item.image_url || '/images/default.jpg' %>">
-
-        <div class="cart-info">
-
-          <h4><%= item.name %></h4>
-
-          <p>Rs <%= item.price %></p>
-
-          <small>
-            Size: <%= item.size || '-' %> |
-            Color: <%= item.color || '-' %>
-          </small>
-
-          <div class="cart-meta">
-
-            <div class="qty-box">
-              <button class="qty-btn minus">-</button>
-
-              <input type="number"
-                     value="<%= item.quantity || 1 %>"
-                     class="qty-input">
-
-              <button class="qty-btn plus">+</button>
-            </div>
-
+          <div class="cart-qty">
+            <span>Qty: <%= item.quantity %></span>
           </div>
 
         </div>
+
+      <% }) %>
+
+    <% } else { %>
+
+      <div class="cart-empty">
+        <i class="fas fa-shopping-bag"></i>
+        <p>Your cart is empty</p>
       </div>
 
-    <% }) %>
+    <% } %>
 
-  <% } %>
-
-  <div class="cart-actions">
-    <a href="/list" class="continue">Continue Shopping</a>
-    <a href="/checkout" class="checkout">
-  Checkout
-</a>
   </div>
+
+  <% if (items && items.length > 0) { %>
+    <div class="cart-footer">
+      <a href="/checkout" class="cart-checkout-btn">Checkout</a>
+    </div>
+  <% } %>
 
 </aside>

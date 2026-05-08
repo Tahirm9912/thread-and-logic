@@ -3,25 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velmora</title>
-    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+    <title>Contact Us - aynByHadiyaz</title>
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/contact.css">
+    <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <%- include("../partials/header-ns") %>
-
-
-<!-- CONTACT US -->
 
 <section class="contact-section reveal">
 
   <h1 class="contact-title">Contact Us</h1>
 
-  <!-- CONTACT INFO -->
   <div class="contact-grid">
 
     <div class="contact-card">
@@ -30,19 +27,19 @@
       <p>Jhelum, Punjab, Pakistan</p>
     </div>
 
-    <a href="#" class="contact-card">
+    <a href="tel:+923001234567" class="contact-card">
       <i class="fas fa-phone"></i>
       <h3>Call Us</h3>
       <p>+92 300 1234567</p>
     </a>
 
-    <a href="#" class="contact-card">
+    <a href="mailto:support@velmora.com" class="contact-card">
       <i class="fas fa-envelope"></i>
       <h3>Email</h3>
       <p>support@velmora.com</p>
     </a>
 
-    <a href="#" class="contact-card">
+    <a href="https://wa.me/923001234567" class="contact-card" target="_blank">
       <i class="fab fa-whatsapp"></i>
       <h3>WhatsApp</h3>
       <p>Chat Now</p>
@@ -52,12 +49,6 @@
       <i class="fab fa-instagram"></i>
       <h3>Instagram</h3>
       <p>Follow Us</p>
-    </a>
-
-    <a href="#" class="contact-card">
-      <i class="fab fa-linkedin"></i>
-      <h3>LinkedIn</h3>
-      <p>Connect</p>
     </a>
 
     <a href="#" class="contact-card">
@@ -72,41 +63,49 @@
       <p>Watch Videos</p>
     </a>
 
+    <a href="#" class="contact-card">
+      <i class="fab fa-linkedin"></i>
+      <h3>LinkedIn</h3>
+      <p>Connect</p>
+    </a>
+
   </div>
 </section>
 
-<!-- MESSAGE FORM -->
 <section class="message-section reveal">
 
   <h2>Send Us a Message</h2>
 
-  <form class="contact-form">
+  <div id="formMessage" class="form-message"></div>
 
-    <input type="text" placeholder="Your Name" required>
+  <form id="contactForm" class="contact-form">
 
-    <input type="text" placeholder="Contact Number" required>
+    <input type="text" name="name" placeholder="Your Name *" required>
 
-    <input type="email" placeholder="Email Address" required>
+    <input type="tel" name="phone" placeholder="Contact Number">
 
-    <textarea placeholder="Your Message..." rows="5" required></textarea>
+    <input type="email" name="email" placeholder="Email Address *" required>
 
-    <button type="submit">Send Message</button>
+    <textarea name="message" placeholder="Your Message... *" rows="5" required minlength="10" maxlength="1000"></textarea>
+
+    <button type="submit" id="submitBtn">
+      <i class="fas fa-paper-plane"></i> Send Message
+    </button>
 
   </form>
 
 </section>
 
-<!-- GOOGLE MAP -->
 <section class="map-section reveal">
 
   <iframe 
     src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3347.2149655900216!2d73.6936581878662!3d32.9717299277446!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1777099188333!5m2!1sen!2s"
-    
-    frameborder="0"
-    allowfullscreen>
+    width="100%"
+    height="450"
+    style="border:0;"
+    allowfullscreen=""
+    loading="lazy">
   </iframe>
-
-  
 
 </section>
 
@@ -114,7 +113,94 @@
 <%- include("../partials/menubar") %>
 <%- include("../partials/cart") %>
 
+<style>
+.form-message {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 4px;
+  display: none;
+}
+
+.form-message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  display: block;
+}
+
+.form-message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  display: block;
+}
+
+#submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+</style>
 
 <script src="/js/contact.js"></script>
+
+<script>
+// Handle form submission
+const contactForm = document.getElementById('contactForm');
+const submitBtn = document.getElementById('submitBtn');
+const formMessage = document.getElementById('formMessage');
+
+contactForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // Disable button
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+  // Get form data
+  const formData = new FormData(contactForm);
+  const data = {
+    name: formData.get('name'),
+    email: formData.get('email'),
+    phone: formData.get('phone'),
+    message: formData.get('message')
+  };
+
+  try {
+    const response = await fetch('/contact/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    // Show message
+    formMessage.textContent = result.message;
+    formMessage.className = result.success ? 'form-message success' : 'form-message error';
+
+    if (result.success) {
+      // Clear form
+      contactForm.reset();
+
+      // Hide success message after 5 seconds
+      setTimeout(() => {
+        formMessage.style.display = 'none';
+      }, 5000);
+    }
+
+  } catch (err) {
+    console.error(err);
+    formMessage.textContent = 'Error sending message. Please try again.';
+    formMessage.className = 'form-message error';
+  }
+
+  // Re-enable button
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+});
+</script>
+
 </body>
 </html>

@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import { createUser, findUserByEmail } from "../models/userModel.js";
 import { createToken } from "../utils/jwt.js";
 
-
 // ==========================
 // 🟢 REGISTER USER
 // ==========================
@@ -18,14 +17,14 @@ export const registerUser = async (req, res) => {
       allow_promotions
     } = req.body;
 
-    // 🔴 Required fields
+    // Required fields
     if (!name || !email || !password || !address || !postal_code || !tel) {
       return res.status(400).render("layouts/signup", {
-        error: "Fill each detail"
+        error: "Please fill in all required fields"
       });
     }
 
-    // 🔴 Email validation
+    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).render("layouts/signup", {
@@ -33,36 +32,43 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // 🔴 Password validation
+    // Password validation
     if (password.length < 8) {
       return res.status(400).render("layouts/signup", {
         error: "Password must be at least 8 characters"
       });
     }
 
-    // 🔴 Postal code validation
+    // Postal code validation
     if (postal_code.length < 4 || postal_code.length > 10) {
       return res.status(400).render("layouts/signup", {
         error: "Invalid Postal Code"
       });
     }
 
-    // 🟡 Promotions checkbox
-    const promotions = allow_promotions === "on";
-
-    // 🟢 Hash password
-    const existingUser = await findUserByEmail(email);
-    
-    if (existingUser) {
-      console.log("Existing users while registrering")
+    // Phone validation
+    const telRegex = /^[0-9]{10,15}$/;
+    if (!telRegex.test(tel.replace(/[\s-]/g, ''))) {
       return res.status(400).render("layouts/signup", {
-        error: "Email already exists"
+        error: "Invalid phone number"
       });
     }
-    
+
+    // Check existing user
+    const existingUser = await findUserByEmail(email);
+    if (existingUser) {
+      return res.status(400).render("layouts/signup", {
+        error: "An account with this email already exists"
+      });
+    }
+
+    // Promotions checkbox
+    const promotions = allow_promotions === "on";
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 🟢 Create user in DB
+    // Create user in DB
     const user = await createUser(
       name,
       email,
@@ -73,25 +79,27 @@ export const registerUser = async (req, res) => {
       tel
     );
 
-    // 🟢 Create JWT token
+    // 🔥 FIX: Include is_admin in token
     const token = createToken({
       userid: user.userid,
-      name: user.name
+      name: user.name,
+      email: user.email,
+      is_admin: user.is_admin || false
     });
 
-    // 🟢 Set cookie
+    // Set cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000
     });
 
     return res.redirect("/");
 
   } catch (err) {
-    console.error(err);
+    console.error("Register error:", err);
     return res.status(500).render("layouts/signup", {
-      error: "Server Error Occurred. Please Try Again"
+      error: "Server error occurred. Please try again."
     });
   }
 };
@@ -103,52 +111,51 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body)
-    console.log("loginUser Triggered");
-    console.log(email)
-    console.log(password)
 
-    // 🔴 Find user
+    // Required fields
+    if (!email || !password) {
+      return res.render("layouts/login", {
+        error: "Please enter email and password"
+      });
+    }
+
+    // Find user
     const user = await findUserByEmail(email);
-
     if (!user) {
-      console.log("user not found")
       return res.render("layouts/login", {
-        error: "Invalid credentials"
+        error: "Invalid email or password"
       });
     }
 
-    // 🔴 Compare password
+    // Compare password
     const match = await bcrypt.compare(password, user.password);
-
     if (!match) {
-      console.log("Password mismatched")
       return res.render("layouts/login", {
-        error: "Invalid credentials"
+        error: "Invalid email or password"
       });
     }
 
-    // 🟢 Create token (FIXED)
+    // 🔥 FIX: Include is_admin in token
     const token = createToken({
       userid: user.userid,
-      name: user.name
+      name: user.name,
+      email: user.email,
+      is_admin: user.is_admin || false
     });
 
-    // 🟢 Set cookie
+    // Set cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000
     });
-
-    console.log("Logged in successfully");
 
     return res.redirect("/");
 
   } catch (err) {
-    console.error(err);
+    console.error("Login error:", err);
     return res.render("layouts/login", {
-      error: "Server Error. Please try again."
+      error: "Server error. Please try again."
     });
   }
 };

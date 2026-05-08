@@ -1,24 +1,22 @@
+import pool from "../config/db.js";
 import {
   createProduct,
   addProductImage,
-  addVariant,
-  getAllProducts,
-  getProductFull
+  addVariant
 } from "../models/productModel.js";
 
-
-
-// ==========================
-// 🟢 SHOW ALL PRODUCTS
-// ==========================
 export const showProduct = async (req, res) => {
   try {
     const id = req.params.id;
 
     const product = await pool.query(
-      "SELECT * FROM products WHERE productid = $1",
+      "SELECT * FROM products WHERE productid = $1 AND is_active = true",
       [id]
     );
+
+    if (product.rows.length === 0) {
+      return res.status(404).render("layouts/404", { message: "Product not found" });
+    }
 
     const variants = await pool.query(
       "SELECT * FROM product_variants WHERE product_id = $1",
@@ -26,78 +24,181 @@ export const showProduct = async (req, res) => {
     );
 
     const images = await pool.query(
-      "SELECT * FROM product_images WHERE product_id = $1",
+      "SELECT * FROM product_images WHERE product_id = $1 ORDER BY is_primary DESC",
       [id]
     );
 
-    // 🔥 TAGS PARSING ADDED HERE
     const productData = product.rows[0];
 
     if (productData.tags) {
-      productData.tags = productData.tags
-        .split(",")
-        .map(tag => tag.trim());
+      productData.tags = productData.tags.split(",").map(tag => tag.trim());
     } else {
       productData.tags = [];
     }
 
-    res.render("layouts/product", {
+    // GET RELATED PRODUCTS (same category or tags)
+    const relatedProducts = await pool.query(`
+      SELECT 
+        p.productid,
+        p.name,
+        p.price,
+        pv.variant_id,
+        pi.image_url
+      FROM products p
+      JOIN LATERAL (
+        SELECT variant_id 
+        FROM product_variants 
+        WHERE product_id = p.productid 
+        LIMIT 1
+      ) pv ON true
+      LEFT JOIN product_images pi 
+        ON pi.product_id = p.productid AND pi.is_primary = true
+      WHERE p.is_active = true 
+        AND p.productid != $1
+        AND (p.category = $2 OR p.tags ILIKE $3)
+      ORDER BY RANDOM()
+      LIMIT 4
+    `, [id, productData.category, `%${productData.tags[0] || ''}%`]);
+
+    return res.render("layouts/product", {
       product: productData,
       variants: variants.rows,
-      images: images.rows
+      images: images.rows,
+      relatedProducts: relatedProducts.rows,
+      breadcrumbs: [
+        { name: 'Home', url: '/' },
+        { name: 'Products', url: '/list' },
+        { name: productData.name, url: '' }
+      ]
     });
 
   } catch (err) {
-    console.log(err);
-    res.send("error");
+    console.error("Show product error:", err);
+    return res.status(500).render("layouts/error", { message: "Could not load product" });
   }
 };
 
+export const showProducts = async (req, res) => {
+  try {
+    const { tag, sort, search } = req.query;
 
+    let query = `
+      SELECT 
+        p.productid,
+        p.name,
+        p.price,
+        p.tags,
+        p.created_at,
+        pv.variant_id,
+        pi.image_url
+      FROM products p
+      JOIN LATERAL (
+        SELECT variant_id 
+        FROM product_variants 
+        WHERE product_id = p.productid 
+        LIMIT 1
+      ) pv ON true
+      LEFT JOIN product_images pi 
+        ON pi.product_id = p.productid AND pi.is_primary = true
+      WHERE p.is_active = true
+    `;
 
+    let values = [];
+    let paramCount = 0;
 
+    // FILTER BY SEARCH - search in name, description, tags, category
+    if (search && search.trim() !== '') {
+      paramCount++;
+      query += ` AND (
+        p.name ILIKE $${paramCount} OR 
+        p.description ILIKE $${paramCount} OR 
+        p.tags ILIKE $${paramCount} OR 
+        p.category ILIKE $${paramCount}
+      )`;
+      values.push(`%${search.trim()}%`);
+    }
 
-// ==========================
-// 🟢 ADD PRODUCT (ADMIN)
-// ==========================
+    // FILTER BY TAG
+    if (tag) {
+      paramCount++;
+      query += ` AND p.tags ILIKE $${paramCount}`;
+      values.push(`%${tag}%`);
+    }
+
+    // SORTING
+    if (sort === 'low') {
+      query += ` ORDER BY p.price ASC`;
+    } else if (sort === 'high') {
+      query += ` ORDER BY p.price DESC`;
+    } else if (sort === 'new') {
+      query += ` ORDER BY p.created_at DESC`;
+    } else {
+      query += ` ORDER BY p.created_at DESC`;
+    }
+
+    const result = await pool.query(query, values);
+
+    const products = result.rows.map(p => ({
+      ...p,
+      tags: p.tags ? p.tags.split(",").map(t => t.trim()) : []
+    }));
+
+ return res.render("layouts/list", {
+      products,
+      activeTag: tag || null,
+      searchQuery: search || null,
+      breadcrumbs: [
+        { name: 'Home', url: '/' },
+        { name: 'Products', url: '' }
+      ]
+    });
+
+  } catch (err) {
+    console.error("Show products error:", err);
+    return res.status(500).render("layouts/error", { message: "Could not load products" });
+  }
+};
+
 export const addProductController = async (req, res) => {
   try {
     const {
       name,
       description,
       category,
+      price,
+      stock,
+      tags,
       is_trending,
       is_top,
       is_featured,
       is_active,
-
-      images,   // array
-      variants  // array
+      images,
+      variants
     } = req.body;
 
-    // 🟢 1. Create product
+    if (!name || !price) {
+      return res.status(400).send("Name and price are required");
+    }
+
     const product = await createProduct({
       name,
       description,
       category,
+      price,
+      stock: stock || 0,
+      tags: tags || "",
       is_trending: is_trending === "on",
       is_top: is_top === "on",
       is_featured: is_featured === "on",
       is_active: is_active === "on"
     });
 
-    // 🟢 2. Insert images
     if (images && images.length > 0) {
       for (let i = 0; i < images.length; i++) {
-        await addProductImage(
-          product.productid,
-          images[i],
-          i === 0 // first = primary
-        );
+        await addProductImage(product.productid, images[i], i === 0);
       }
     }
 
-    // 🟢 3. Insert variants
     if (variants && variants.length > 0) {
       for (let v of variants) {
         await addVariant({
@@ -115,71 +216,7 @@ export const addProductController = async (req, res) => {
     return res.redirect("/admin/products");
 
   } catch (err) {
-    console.log(err);
-    return res.send("Error creating product");
-  }
-};
-
-
-import pool from "../config/db.js";
-
-// ==========================
-// 🟢 GET ALL PRODUCTS (ONLY WITH VARIANTS)
-// ==========================
-export const showProducts = async (req, res) => {
-  try {
-    const { tag } = req.query;
-
-    let query = `
-      SELECT 
-        p.productid,
-        p.name,
-        p.price,
-        p.tags,
-        pv.variant_id,
-        pi.image_url
-
-      FROM products p
-
-      JOIN LATERAL (
-        SELECT variant_id 
-        FROM product_variants 
-        WHERE product_id = p.productid 
-        LIMIT 1
-      ) pv ON true
-
-      LEFT JOIN product_images pi 
-        ON pi.product_id = p.productid 
-        AND pi.is_primary = true
-
-      WHERE p.is_active = true
-    `;
-
-    let values = [];
-
-    // 🔥 FILTER BY TAG
-    if (tag) {
-      query += ` AND p.tags ILIKE $1`;
-      values.push(`%${tag}%`);
-    }
-
-    const result = await pool.query(query, values);
-
-    // parse tags
-    const products = result.rows.map(p => ({
-      ...p,
-      tags: p.tags
-        ? p.tags.split(",").map(t => t.trim())
-        : []
-    }));
-
-    res.render("layouts/list", {
-      products,
-      activeTag: tag || null
-    });
-
-  } catch (err) {
-    console.log(err);
-    res.send("Error loading products");
+    console.error("Add product error:", err);
+    return res.status(500).send("Error creating product");
   }
 };

@@ -1,9 +1,8 @@
 import pool from "../config/db.js";
 
-// ==========================
-// 🟢 ADD TO CART
-// ==========================
 export const addToCart = async (req, res) => {
+  const client = await pool.connect(); // Use connection from pool
+  
   try {
     const { product_id, variant_id, quantity } = req.body;
     const userId = req.user.userid;
@@ -12,16 +11,40 @@ export const addToCart = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid data" });
     }
 
-    // get or create cart
-    let cart = await pool.query(
-      "SELECT id FROM cart WHERE user_id = $1",
+    const qty = parseInt(quantity) || 1;
+    if (qty < 1) {
+      return res.status(400).json({ success: false, message: "Invalid quantity" });
+    }
+
+    // Check variant exists
+    const variant = await client.query(
+      "SELECT * FROM product_variants WHERE variant_id = $1 AND product_id = $2",
+      [variant_id, product_id]
+    );
+
+    if (variant.rows.length === 0) {
+      client.release();
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    if (variant.rows[0].stock < qty) {
+      client.release();
+      return res.status(400).json({ success: false, message: "Not enough stock" });
+    }
+
+    // START TRANSACTION
+    await client.query('BEGIN');
+
+    // Get or create cart with lock
+    let cart = await client.query(
+      "SELECT id FROM cart WHERE user_id = $1 FOR UPDATE",
       [userId]
     );
 
     let cartId;
 
     if (cart.rows.length === 0) {
-      const newCart = await pool.query(
+      const newCart = await client.query(
         "INSERT INTO cart (user_id) VALUES ($1) RETURNING id",
         [userId]
       );
@@ -30,42 +53,44 @@ export const addToCart = async (req, res) => {
       cartId = cart.rows[0].id;
     }
 
-    // check existing item
-    const existing = await pool.query(
-      `SELECT id FROM cart_items 
-       WHERE cart_id = $1 AND product_id = $2 AND variant_id = $3`,
+    // Check existing item with lock
+    const existing = await client.query(
+      `SELECT id, quantity FROM cart_items 
+       WHERE cart_id = $1 AND product_id = $2 AND variant_id = $3
+       FOR UPDATE`,
       [cartId, product_id, variant_id]
     );
 
     if (existing.rows.length > 0) {
-      await pool.query(
+      // Update existing
+      await client.query(
         `UPDATE cart_items 
          SET quantity = quantity + $1 
          WHERE id = $2`,
-        [quantity, existing.rows[0].id]
+        [qty, existing.rows[0].id]
       );
     } else {
-      await pool.query(
-        `INSERT INTO cart_items 
-        (cart_id, product_id, variant_id, quantity)
-        VALUES ($1, $2, $3, $4)`,
-        [cartId, product_id, variant_id, quantity]
+      // Insert new
+      await client.query(
+        `INSERT INTO cart_items (cart_id, product_id, variant_id, quantity)
+         VALUES ($1, $2, $3, $4)`,
+        [cartId, product_id, variant_id, qty]
       );
     }
 
-    res.json({ success: true });
+    await client.query('COMMIT');
+    client.release();
+    
+    return res.json({ success: true });
 
   } catch (err) {
-    console.log("ADD CART ERROR:", err);
-    res.status(500).json({ success: false });
+    await client.query('ROLLBACK');
+    client.release();
+    console.error("Add to cart error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-
-
-// ==========================
-// 🟢 GET CART ITEMS
-// ==========================
 export const getCartItems = async (req, res) => {
   try {
     const userId = req.user.userid;
@@ -98,21 +123,14 @@ export const getCartItems = async (req, res) => {
       WHERE ci.cart_id = $1
     `, [cart.rows[0].id]);
 
-    res.render("partials/cart", {
-      items: items.rows
-    });
+    return res.render("partials/cart", { items: items.rows });
 
   } catch (err) {
-    console.log(err);
-    res.render("partials/cart", { items: [] });
+    console.error("Get cart error:", err);
+    return res.render("partials/cart", { items: [] });
   }
 };
 
-
-
-// ==========================
-// 🟢 CHECKOUT PAGE
-// ==========================
 export const getCheckoutPage = async (req, res) => {
   try {
     const userId = req.user.userid;
@@ -123,10 +141,7 @@ export const getCheckoutPage = async (req, res) => {
     );
 
     if (cart.rows.length === 0) {
-      return res.render("layouts/checkout", {
-        items: [],
-        total: 0
-      });
+      return res.render("layouts/checkout", { items: [], total: 0 });
     }
 
     const items = await pool.query(`
@@ -136,6 +151,7 @@ export const getCheckoutPage = async (req, res) => {
         p.productid,
         p.name,
         p.price,
+        pv.variant_id,
         pv.size,
         pv.color,
         pi.image_url
@@ -147,68 +163,77 @@ export const getCheckoutPage = async (req, res) => {
       WHERE ci.cart_id = $1
     `, [cart.rows[0].id]);
 
-      let total = 0;
+    let total = 0;
+    items.rows.forEach(item => {
+      total += parseFloat(item.price) * item.quantity;
+    });
 
-// 🔥 calculate total
-items.rows.forEach(item => {
-  total += item.price * item.quantity;
-});
-
-return res.render("layouts/checkout", {
-  items: items.rows,
-  total
-});
+    return res.render("layouts/checkout", {
+      items: items.rows,
+      total: total.toFixed(2)
+    });
 
   } catch (err) {
-    console.log(err);
-    res.render("layouts/checkout", {
-      items: [],
-      total: 0
-    });
+    console.error("Checkout page error:", err);
+    return res.render("layouts/checkout", { items: [], total: 0 });
   }
 };
 
-
-
-// ==========================
-// 🟢 UPDATE QTY
-// ==========================
 export const updateCartItem = async (req, res) => {
   try {
     const { itemId, quantity } = req.body;
+    const userId = req.user.userid;
+
+    const qty = parseInt(quantity);
+    if (!qty || qty < 1) {
+      return res.status(400).json({ success: false, message: "Invalid quantity" });
+    }
+
+    const check = await pool.query(`
+      SELECT ci.id FROM cart_items ci
+      JOIN cart c ON ci.cart_id = c.id
+      WHERE ci.id = $1 AND c.user_id = $2
+    `, [itemId, userId]);
+
+    if (check.rows.length === 0) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
 
     await pool.query(
-      `UPDATE cart_items SET quantity = $1 WHERE id = $2`,
-      [quantity, itemId]
+      "UPDATE cart_items SET quantity = $1 WHERE id = $2",
+      [qty, itemId]
     );
 
-    res.json({ success: true });
+    return res.json({ success: true });
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false });
+    console.error("Update cart error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-
-
-// ==========================
-// 🟢 REMOVE ITEM
-// ==========================
 export const removeCartItem = async (req, res) => {
   try {
     const { itemId } = req.body;
+    const userId = req.user.userid;
 
-    await pool.query(
-      "DELETE FROM cart_items WHERE id = $1",
-      [itemId]
-    );
+    const check = await pool.query(`
+      SELECT ci.id FROM cart_items ci
+      JOIN cart c ON ci.cart_id = c.id
+      WHERE ci.id = $1 AND c.user_id = $2
+    `, [itemId, userId]);
 
-    res.json({ success: true });
+    if (check.rows.length === 0) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
+
+    await pool.query("DELETE FROM cart_items WHERE id = $1", [itemId]);
+
+    return res.json({ success: true });
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false });
+    console.error("Remove cart item error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -230,10 +255,10 @@ export const clearCart = async (req, res) => {
       [cart.rows[0].id]
     );
 
-    res.json({ success: true });
+    return res.json({ success: true });
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false });
+    console.error("Clear cart error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };

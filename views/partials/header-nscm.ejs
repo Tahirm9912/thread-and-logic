@@ -1,18 +1,19 @@
 <header class="navbar">
   <div class="nav-left">
-      
-  </div>
-
-  <div class="logo">
-    <a href="/">
-      <img src="/images/logo.png" class="nav_img">
+       <a href="/list" class="logo">
+      <img src="/images/logo.png" alt="aynByHadiyaz" class="logo-img">
     </a>
   </div>
 
   <div class="nav-right">
-    
-
-
-    
+    <% if (user) { %>
+      <a href="/account" class="nav-icon">
+        <i class="fas fa-user"></i>
+      </a>
+    <% } else { %>
+      <a href="/login" class="nav-icon">
+        <i class="fas fa-user"></i>
+      </a>
+    <% } %>
   </div>
 </header>

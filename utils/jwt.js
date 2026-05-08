@@ -4,6 +4,14 @@ export const createToken = (payload) => {
   return jwt.sign(
     payload,
     process.env.JWT_SECRET,
-    { expiresIn: "1d" }
+    { expiresIn: "7d" }  // 7 days
   );
+};
+
+export const verifyToken = (token) => {
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return null;
+  }
 };

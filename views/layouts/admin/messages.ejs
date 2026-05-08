@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Messages</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin-main.css">
+  
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+</head>
+<body>
+
+<%- include('../../partials/admin-header') %>
+
+<div class="admin-container">
+  
+  <%- include('../../partials/admin-sidebar') %>
+
+  <main class="admin-main">
+    
+    <div class="page-header">
+      <h1>Contact Messages</h1>
+      
+      <div class="filter-tabs">
+        <a href="/admin/messages?status=all" class="tab <%= filterStatus === 'all' ? 'active' : '' %>">
+          All
+        </a>
+        <a href="/admin/messages?status=unread" class="tab <%= filterStatus === 'unread' ? 'active' : '' %>">
+          Unread
+        </a>
+        <a href="/admin/messages?status=read" class="tab <%= filterStatus === 'read' ? 'active' : '' %>">
+          Read
+        </a>
+        <a href="/admin/messages?status=replied" class="tab <%= filterStatus === 'replied' ? 'active' : '' %>">
+          Replied
+        </a>
+        <a href="/admin/messages?status=archived" class="tab <%= filterStatus === 'archived' ? 'active' : '' %>">
+          Archived
+        </a>
+      </div>
+    </div>
+
+    <% if (messages && messages.length > 0) { %>
+
+      <div class="messages-list">
+
+        <% messages.forEach(msg => { %>
+          
+          <div class="message-card <%= msg.status %>">
+            
+            <div class="message-header">
+              <div>
+                <h3><%= msg.name %></h3>
+                <p class="message-meta">
+                  <i class="fas fa-envelope"></i> <%= msg.email %>
+                  <% if (msg.phone) { %>
+                    • <i class="fas fa-phone"></i> <%= msg.phone %>
+                  <% } %>
+                </p>
+                <p class="message-date">
+                  <i class="fas fa-clock"></i> <%= new Date(msg.created_at).toLocaleString() %>
+                </p>
+              </div>
+
+              <div class="message-actions">
+                <select onchange="updateStatus(<%= msg.id %>, this.value)" class="status-select">
+                  <option value="unread" <%= msg.status === 'unread' ? 'selected' : '' %>>Unread</option>
+                  <option value="read" <%= msg.status === 'read' ? 'selected' : '' %>>Read</option>
+                  <option value="replied" <%= msg.status === 'replied' ? 'selected' : '' %>>Replied</option>
+                  <option value="archived" <%= msg.status === 'archived' ? 'selected' : '' %>>Archived</option>
+                </select>
+
+                <button onclick="deleteMessage(<%= msg.id %>)" class="btn-danger btn-sm">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="message-body">
+              <p><%= msg.message %></p>
+            </div>
+
+            <div class="message-footer">
+              <a href="mailto:<%= msg.email %>?subject=Re: Your message to Velmora" class="btn-primary btn-sm">
+                <i class="fas fa-reply"></i> Reply via Email
+              </a>
+              <% if (msg.phone) { %>
+                <a href="https://wa.me/<%= msg.phone.replace(/[^0-9]/g, '') %>" target="_blank" class="btn-secondary btn-sm">
+                  <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+              <% } %>
+            </div>
+
+          </div>
+
+        <% }) %>
+
+      </div>
+
+    <% } else { %>
+
+      <div class="no-messages">
+        <i class="fas fa-inbox"></i>
+        <p>No messages found</p>
+      </div>
+
+    <% } %>
+
+  </main>
+
+</div>
+
+<style>
+.filter-tabs {
+  display: flex;
+  gap: 1rem;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  background: #f0f0f0;
+  color: #666;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.tab:hover {
+  background: #e0e0e0;
+}
+
+.tab.active {
+  background: #1a1a1a;
+  color: white;
+}
+
+.messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.message-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+  border-left: 4px solid #ccc;
+}
+
+.message-card.unread {
+  border-left-color: #e74c3c;
+}
+
+.message-card.read {
+  border-left-color: #3498db;
+}
+
+.message-card.replied {
+  border-left-color: #2ecc71;
+}
+
+.message-card.archived {
+  border-left-color: #95a5a6;
+  opacity: 0.7;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.message-header h3 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.message-meta {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.message-date {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.message-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.message-body {
+  padding: 1.5rem;
+  background: white;
+}
+
+.message-body p {
+  color: #333;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.message-footer {
+  padding: 1rem 1.5rem;
+  background: #f9f9f9;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  gap: 1rem;
+}
+
+.no-messages {
+  text-align: center;
+  padding: 4rem;
+  color: #999;
+}
+
+.no-messages i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.no-messages p {
+  font-size: 1.2rem;
+}
+</style>
+
+<script>
+function updateStatus(messageId, status) {
+  fetch('/admin/messages/update-status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messageId, status })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('Error updating status');
+    }
+  });
+}
+
+function deleteMessage(id) {
+  if (!confirm('Delete this message?')) return;
+
+  fetch(`/admin/messages/${id}`, {
+    method: 'DELETE'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('Error deleting message');
+    }
+  });
+}
+</script>
+
+</body>
+</html>

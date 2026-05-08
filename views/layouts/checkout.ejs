@@ -3,146 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Now!</title>
-    <link rel="shortcut icon" href="resources/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+    
+    <title>Checkout - aynByHadiyaz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/css/checkout.css">
+    <link rel="stylesheet" href="/css/main.css">
 </head>
 
 <body>
 
 <%- include("../partials/header-nscm") %>
 
-
-<!-- CHECKOUT SECTION -->
 <section class="checkout-section">
 
   <div class="checkout-container">
 
     <h2 class="checkout-title">Checkout</h2>
 
-    <div class="table-wrapper">
+    <% if (items && items.length > 0) { %>
 
-      <table class="checkout-table">
+      <div class="table-wrapper">
 
-        <thead>
-          <tr>
-            <th>  </th>
-            <th>Sr.</th>
-            <th>Image</th>
-            <th>Product</th>
-            <th>Size</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+        <table class="checkout-table">
 
-<tbody>
+          <thead>
+            <tr>
+              <th>Sr.</th>
+              <th>Image</th>
+              <th>Product</th>
+              <th>Size</th>
+              <th>Color</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-<% let index = 1 %>
+          <tbody>
 
-<% items.forEach(item => { %>
+            <% let index = 1 %>
 
-<tr>
+            <% items.forEach(item => { %>
 
-  <!-- SELECT ITEM -->
-  <td>
-    <input 
-      type="checkbox" 
-      class="item-select" 
-      value="<%= item.id %>"
-      checked
-    >
-  </td>
+              <tr>
 
-  <td><%= index++ %></td>
+                <td><%= index++ %></td>
 
-  <td>
-    <img src="<%= item.image_url || '/images/default.jpg' %>" width="60">
-  </td>
+                <td>
+                  <img src="<%= item.image_url || '/images/default.jpg' %>" width="60" alt="<%= item.name %>">
+                </td>
 
-  <td>
-    <a href="/product/<%= item.productid %>">
-      <%= item.name %>
-    </a>
-  </td>
+                <td>
+                  <a href="/product/<%= item.productid %>">
+                    <%= item.name %>
+                  </a>
+                </td>
 
-  <td>
-    <select class="size-select">
-      <option selected><%= item.size %></option>
-    </select>
-  </td>
+                <td><%= item.size %></td>
 
-  <td>
-    <div class="qty-box">
-      <button class="qty-btn minus">-</button>
+                <td><%= item.color %></td>
 
-      <input 
-        type="number" 
-        value="<%= item.quantity %>" 
-        min="1"
-        class="qty-input"
-        data-id="<%= item.id %>"
-      >
+                <td>
+                  <div class="qty-box">
+                    <button class="qty-btn" onclick="updateQty(<%= item.id %>, -1, <%= item.quantity %>)">-</button>
+                    <span class="qty-display" id="qty-<%= item.id %>"><%= item.quantity %></span>
+                    <button class="qty-btn" onclick="updateQty(<%= item.id %>, 1, <%= item.quantity %>)">+</button>
+                  </div>
+                </td>
 
-      <button class="qty-btn plus">+</button>
-    </div>
-  </td>
+                <td>Rs <%= parseFloat(item.price).toFixed(0) %></td>
 
-  <td>
-    Rs <%= item.price * item.quantity %>
-  </td>
+                <td>Rs <%= (parseFloat(item.price) * item.quantity).toFixed(0) %></td>
 
-  <td>
-    <button class="remove-btn" onclick="removeItem(<%= item.id %>)">
-      <i class="fas fa-trash"></i>
-    </button>
-  </td>
+                <td>
+                  <button class="remove-btn" onclick="removeItem(<%= item.id %>)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
 
-</tr>
+              </tr>
 
-<% }) %>
+            <% }) %>
 
-</tbody>
+          </tbody>
 
-      </table>
+        </table>
 
-    </div>
+      </div>
 
+      <!-- TOTALS -->
+      <div class="checkout-summary">
 
-    <!-- TOTALS -->
-    <div class="checkout-summary">
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span id="subtotal">Rs <%= parseFloat(total).toFixed(0) %></span>
+        </div>
 
-<div class="summary-row">
-  <span>Items Total:</span>
-  <span>Rs <%= total %></span>
-</div>
+        <div class="summary-row">
+          <span>Delivery Charges:</span>
+          <span>Rs 200</span>
+        </div>
 
-<div class="summary-row">
-  <span>Delivery Charges:</span>
-  <span>Rs 200</span>
-</div>
+        <hr>
 
-<div class="summary-row total">
-  <span>Total:</span>
-  <span>Rs <%= total + 200 %></span>
-</div>
+        <div class="summary-row total">
+          <span>Total:</span>
+          <span id="grandTotal">Rs <%= (parseFloat(total) + 200).toFixed(0) %></span>
+        </div>
 
-<button onclick="goToPayout()" class="checkout-btn">
-  Proceed to Checkout
-</button>
+        <button onclick="goToPayout()" class="checkout-btn">
+          Proceed to Payment
+        </button>
 
-    </div>
+      </div>
+
+    <% } else { %>
+
+      <div class="empty-cart">
+        <i class="fas fa-shopping-cart"></i>
+        <h3>Your cart is empty</h3>
+        <a href="/list" class="shop-btn">Continue Shopping</a>
+      </div>
+
+    <% } %>
 
   </div>
 
 </section>
 
+<%- include('../partials/menubar') %>
+<%- include('../partials/cart') %>
+<%- include('../partials/footer') %>
 
- <%- include('../partials/menubar') %>
- <%- include('../partials/cart') %>
- <%- include('../partials/footer') %>
-  <script src="/js/checkout.js"></script>
+<script src="/js/checkout.js"></script>
+
 </body>
 </html>

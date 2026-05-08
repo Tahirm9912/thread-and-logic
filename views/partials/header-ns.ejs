@@ -1,25 +1,26 @@
 <header class="navbar">
   <div class="nav-left">
-      <i class="fas fa-bars nav-icon" id="menuToggle"></i>
-  </div>
-
-  <div class="logo">
-    <a href="/">
-      <img src="/images/logo.png" class="nav_img">
-    </a>
-  </div>
+    <i class="fas fa-bars" id="menuToggle"></i>
+    <a href="/list" class="logo">
+      <img src="/images/logo.png" alt="aynByHadiyaz" class="logo-img">
+    </a>  </div>
 
   <div class="nav-right">
-  
+    <% if (user) { %>
+      <a href="/account" class="nav-icon">
+        <i class="fas fa-user"></i>
+      </a>
+    <% } else { %>
+      <a href="/login" class="nav-icon">
+        <i class="fas fa-user"></i>
+      </a>
+    <% } %>
 
-  <a href="/account">
-    <i class="fas fa-user nav-icon"></i>
-  </a>
-
-  <!-- CART ICON WRAPPER -->
-  <div class="cart-wrapper">
-    <i class="fas fa-shopping-bag nav-icon cart-icon"></i>
-    <span class="cart-dot"></span>
+    <div class="cart-wrapper <%= (items && items.length > 0) ? 'active' : '' %>">
+      <i class="fas fa-shopping-bag cart-icon"></i>
+      <% if (items && items.length > 0) { %>
+        <span class="cart-badge"><%= cartCount || items.length %></span>
+      <% } %>
+    </div>
   </div>
-</div>
 </header>
