@@ -3,75 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Now!</title>
-  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+    <title>Login - Ayn By Hadiyaz</title>
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     <link rel="stylesheet" href="/css/login.css">
     <link rel="stylesheet" href="/css/main.css">
-
+    <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <%- include("../partials/header-nscm") %>
 
-
-<!-- SIGN IN SECTION -->
 <section class="auth-section">
 
   <div class="auth-container">
 
     <h2>Sign In</h2>
 
-    <form action="/api/auth/login" method="POST" class="auth-form">
+<form action="/api/auth/login" method="POST" class="auth-form">
 
-      <!-- EMAIL -->
-      <div class="form-group">
-        <label>Email</label>
-        <input name="email" type="email" placeholder="Enter your email" required>
-      </div>
+  <!-- CRITICAL: Hidden field MUST be here -->
+  <input type="hidden" name="returnUrl" value="<%= returnUrl %>">
 
-      <!-- PASSWORD -->
-      <div class="form-group">
-        <label>Password</label>
-        <input name="password" type="password" placeholder="Enter password" required>
-      </div>
-
-      <!-- FORGOT PASSWORD -->
-      <p class="forgot-link">
-        <a href="/forgot-password">Forgot Password?</a>
-      </p>
-
-      <!-- BUTTON -->
-      <button type="submit" class="auth-btn">
-        Sign In
-      </button>
-
-<% if (error) { %>
-  <div class="auth-message" id="notification_pan">
-    <div class="message error">
-      <%= error %>
-    </div>
+  <!-- EMAIL -->
+  <div class="form-group">
+    <label>Email</label>
+    <input name="email" type="email" placeholder="Enter your email" required>
   </div>
-<% } %>
 
-      <!-- CREATE ACCOUNT LINK -->
-      <p class="auth-switch">
-        Don’t have an account? 
-        <a href="/signup">Create Account</a>
-        
-      </p>      
+  <!-- PASSWORD -->
+  <div class="form-group">
+    <label>Password</label>
+    <input name="password" type="password" placeholder="Enter password" required>
+  </div>
 
+  <!-- FORGOT PASSWORD -->
+  <p class="forgot-link">
+    <a href="/forgot-password">Forgot Password?</a>
+  </p>
 
-    </form>
+  <!-- BUTTON -->
+  <button type="submit" class="auth-btn">
+    Sign In
+  </button>
+
+  <% if (error) { %>
+    <div class="auth-message" id="notification_pan">
+      <div class="message error">
+        <%= error %>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- CREATE ACCOUNT LINK -->
+  <p class="auth-switch">
+    Don't have an account? 
+    <a href="/signup?returnUrl=<%= encodeURIComponent(returnUrl) %>">Create Account</a>
+  </p>
+
+</form>
 
   </div>
 
 </section>
-
-
 
 <script>
   const pan = document.getElementById("notification_pan");
@@ -79,7 +74,7 @@
   if (pan) {
     setTimeout(() => {
       pan.classList.add("hidden");
-    }, 3000); // 3 seconds
+    }, 3000);
   }
 </script>
 

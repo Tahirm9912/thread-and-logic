@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/css/product.css">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta name="<%= product.name %>" content="<%= product.description %>" />
 </head>
 
 <body>
@@ -15,27 +16,38 @@
 <%- include('../partials/header-ns') %>
 <%- include("../partials/breadcrumb") %>
 
-
 <section class="product-page">
 
-  <!-- LEFT -->
+  <!-- LEFT SIDE - IMAGES -->
   <div class="product-images">
+    
+    <!-- MAIN IMAGE -->
     <div class="main-image">
-      <img id="mainImg" src="<%= images[0]?.image_url || '/images/default.jpg' %>">
+      <% if (images && images.length > 0) { %>
+        <img id="mainImg" src="<%= images[0].image_url %>" alt="<%= images[0].alt_text || product.name %>">
+      <% } else { %>
+        <img id="mainImg" src="/images/default.jpg" alt="<%= product.name %>">
+      <% } %>
     </div>
 
-    <div class="thumbs">
-      <% images.forEach((img, i) => { %>
-        <img 
-          src="<%= img.image_url %>" 
-          class="thumb <%= i === 0 ? 'active' : '' %>"
-          onclick="changeImage(this)">
-      <% }) %>
-    </div>
+    <!-- THUMBNAIL IMAGES -->
+    <% if (images && images.length > 0) { %>
+      <div class="thumbs">
+        <% images.forEach((img, index) => { %>
+          <img 
+            src="<%= img.image_url %>" 
+            alt="<%= img.alt_text || product.name %>"
+            class="thumb <%= index === 0 ? 'active' : '' %>"
+            onclick="changeImage(this)">
+        <% }) %>
+      </div>
+    <% } %>
+
   </div>
 
-  <!-- RIGHT -->
+  <!-- RIGHT SIDE - INFO -->
   <div class="product-info">
+    <!-- rest of product info ... -->
 
     <h1><%= product.name %></h1>
 
@@ -171,7 +183,7 @@ function updateVariant() {
     const variant = getVariant();
 
     if (!variant) {
-      alert("Please select size and color");
+      alert("Please choose correct size and color");
       return;
     }
 

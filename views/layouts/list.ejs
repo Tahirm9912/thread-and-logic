@@ -59,7 +59,10 @@
     <i class="far fa-heart"></i>
   </button>
           <a href="/product/<%= product.productid %>" class="card-link">
-            <img src="<%= product.image_url || '/images/default.jpg' %>" alt="<%= product.name %>">
+           <img 
+  src="<%= product.image_url || '/images/default.jpg' %>" 
+  alt="<%= product.alt_text || product.name %>"
+>
     
             <div class="listing-info">
               <h3><%= product.name %></h3>

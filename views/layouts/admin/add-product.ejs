@@ -67,20 +67,28 @@
         </div>
       </section>
 
-      <section class="form-section">
-        <h2>Product Images</h2>
-        
-        <div id="imagesContainer">
-          <div class="form-group">
-            <label>Image URL 1 (Primary)</label>
-            <input type="text" name="images[]" placeholder="/images/product1.jpg">
-          </div>
+<section class="form-section">
+  <h2>Product Images</h2>
+  
+  <div id="imagesContainer">
+    <div class="image-group">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Image URL 1 (Primary) *</label>
+          <input type="text" name="images[]" placeholder="/images/product1.jpg" required>
         </div>
+        <div class="form-group">
+          <label>Alt Text (SEO) *</label>
+          <input type="text" name="image_alts[]" placeholder="e.g., Blue Lawn Dress Summer Collection" required>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <button type="button" onclick="addImageField()" class="btn-secondary">
-          <i class="fas fa-plus"></i> Add More Images
-        </button>
-      </section>
+  <button type="button" onclick="addImageField()" class="btn-secondary">
+    <i class="fas fa-plus"></i> Add More Images
+  </button>
+</section>
 
       <section class="form-section">
         <h2>Product Variants</h2>
@@ -257,24 +265,38 @@
   gap: 1rem;
   margin-top: 2rem;
 }
+.image-group {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
 </style>
 
 <script>
 let imageCount = 1;
 let variantCount = 1;
 
+
 function addImageField() {
   imageCount++;
   const container = document.getElementById('imagesContainer');
   const div = document.createElement('div');
-  div.className = 'form-group';
+  div.className = 'image-group';
   div.innerHTML = `
-    <label>Image URL ${imageCount}</label>
-    <input type="text" name="images[]" placeholder="/images/product${imageCount}.jpg">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Image URL ${imageCount}</label>
+        <input type="text" name="images[]" placeholder="/images/product${imageCount}.jpg">
+      </div>
+      <div class="form-group">
+        <label>Alt Text (SEO)</label>
+        <input type="text" name="image_alts[]" placeholder="Description for SEO">
+      </div>
+    </div>
   `;
   container.appendChild(div);
 }
-
 function addVariantField() {
   const container = document.getElementById('variantsContainer');
   const div = document.createElement('div');

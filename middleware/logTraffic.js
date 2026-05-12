@@ -1,25 +1,50 @@
 import pool from "../config/db.js";
 
 export const logTraffic = async (req, res, next) => {
-  try {
-    const ip =
-      req.headers["x-forwarded-for"]?.split(",")[0] ||
-      req.socket.remoteAddress;
+  const startTime = Date.now();
 
-    const route = req.originalUrl;
+  // Store original functions
+  const originalSend = res.send;
+  const originalJson = res.json;
 
-    // OPTIONAL: simple location placeholder (you can upgrade later with IP API)
-    const location = "unknown";
+  let statusCode = 200;
 
-    await pool.query(
-      `INSERT INTO traffic (ip, location, routing)
-       VALUES ($1, $2, $3)`,
-      [ip, location, route]
-    );
+  // Override res.send
+  res.send = function(data) {
+    statusCode = res.statusCode || 200;
+    originalSend.call(this, data);
+  };
 
-    next(); // continue request
-  } catch (error) {
-    console.error("Traffic log error:", error);
-    next(); // don’t block site if logging fails
-  }
+  // Override res.json
+  res.json = function(data) {
+    statusCode = res.statusCode || 200;
+    originalJson.call(this, data);
+  };
+
+  // When response finishes
+  res.on('finish', async () => {
+    try {
+      const endpoint = req.originalUrl || req.url;
+      const method = req.method;
+      const userId = req.user?.userid || null;
+      const ipAddress = req.ip || req.connection.remoteAddress || 'unknown';
+      const userAgent = req.get('user-agent') || 'unknown';
+
+      // Truncate long strings to prevent errors
+      const truncatedEndpoint = endpoint.substring(0, 250);
+      const truncatedUserAgent = userAgent.substring(0, 490);
+      const truncatedIp = ipAddress.substring(0, 95);
+
+      await pool.query(
+        `INSERT INTO traffic_logs (endpoint, method, status_code, user_id, ip_address, user_agent) 
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [truncatedEndpoint, method, statusCode, userId, truncatedIp, truncatedUserAgent]
+      );
+    } catch (err) {
+      // Don't crash the app if logging fails
+      console.error('Traffic log error:', err.message);
+    }
+  });
+
+  next();
 };

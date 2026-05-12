@@ -5,7 +5,9 @@ export const protectPage = (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token) {
-      return res.redirect("/login");
+      // Store the original URL
+      const returnUrl = req.originalUrl;
+      return res.redirect(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -14,6 +16,7 @@ export const protectPage = (req, res, next) => {
 
   } catch (err) {
     res.clearCookie("token");
-    return res.redirect("/login");
+    const returnUrl = req.originalUrl;
+    return res.redirect(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
   }
 };

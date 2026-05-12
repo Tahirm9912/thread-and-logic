@@ -51,9 +51,10 @@ app.use("/api/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/cart", cartRoutes);
 app.use("/order", orderRoutes);
-app.use("/", pageRoutes); // ← This MUST be LAST
 
-// ❌ 404 handler
+app.use("/", pageRoutes);
+
+
 app.use((req, res) => {
   res.status(404).render("layouts/404", { message: "Page not found" });
 });

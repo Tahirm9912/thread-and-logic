@@ -126,20 +126,26 @@ function updateProfile(e) {
 
   const formData = new FormData(e.target);
 
+  const data = {
+    email: formData.get("email"),
+    tel: formData.get("tel"),
+    address: formData.get("address"),
+    postal_code: formData.get("postal_code")
+  };
+
+  console.log('Sending update:', data);
+
   fetch("/user/update", {
     method: "POST",
-    body: JSON.stringify({
-      email: formData.get("email"),
-      tel: formData.get("tel"),
-      address: formData.get("address"),
-      postal_code: formData.get("postal_code")
-    }),
     headers: {
       "Content-Type": "application/json"
-    }
+    },
+    body: JSON.stringify(data)
   })
   .then(res => res.json())
   .then(data => {
+    console.log('Update response:', data);
+    
     if (data.success) {
       alert("Profile updated successfully!");
       location.reload();
@@ -148,12 +154,14 @@ function updateProfile(e) {
     }
   })
   .catch(err => {
-    console.error(err);
+    console.error('Update error:', err);
     alert("Error updating profile");
   });
 }
 
+// Make function global
+window.updateProfile = updateProfile;
+
 // Make functions global
 window.toggleEdit = toggleEdit;
 window.cancelEdit = cancelEdit;
-window.updateProfile = updateProfile;

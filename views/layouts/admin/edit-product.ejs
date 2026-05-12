@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Product</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin-main.css">
+</head>
+<body>
+
+<%- include('../../partials/admin-header') %>
+
+<div class="admin-container">
+  
+  <%- include('../../partials/admin-sidebar') %>
+
+  <main class="admin-main">
+    
+    <h1>Edit Product</h1>
+
+    <form action="/admin/products/update/<%= product.productid %>" method="POST" class="product-form">
+
+      <section class="form-section">
+        <h2>Basic Information</h2>
+
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" name="name" value="<%= product.name %>" required>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="4"><%= product.description || '' %></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category">
+              <option value="Women" <%= product.category === 'Women' ? 'selected' : '' %>>Women</option>
+              <option value="Men" <%= product.category === 'Men' ? 'selected' : '' %>>Men</option>
+              <option value="Kids" <%= product.category === 'Kids' ? 'selected' : '' %>>Kids</option>
+              <option value="Accessories" <%= product.category === 'Accessories' ? 'selected' : '' %>>Accessories</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Base Price (Rs) *</label>
+            <input type="number" name="price" value="<%= product.price %>" required step="0.01">
+          </div>
+
+          <div class="form-group">
+            <label>Stock Quantity</label>
+            <input type="number" name="stock" value="<%= product.stock %>">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Tags (comma separated)</label>
+          <input type="text" name="tags" value="<%= product.tags || '' %>">
+          <small>e.g., new, summer, formal, casual, sale</small>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h2>Options</h2>
+
+        <div class="checkbox-group">
+          <label>
+            <input type="checkbox" name="is_active" <%= product.is_active ? 'checked' : '' %>>
+            <span>Active</span>
+          </label>
+
+          <label>
+            <input type="checkbox" name="is_trending" <%= product.is_trending ? 'checked' : '' %>>
+            <span>Trending</span>
+          </label>
+
+          <label>
+            <input type="checkbox" name="is_featured" <%= product.is_featured ? 'checked' : '' %>>
+            <span>Featured</span>
+          </label>
+
+          <label>
+            <input type="checkbox" name="is_top" <%= product.is_top ? 'checked' : '' %>>
+            <span>Top Product</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h2>Product Variants</h2>
+        <p class="help-text">Update stock and prices for each variant</p>
+        
+        <% if (variants && variants.length > 0) { %>
+          <% variants.forEach((variant, index) => { %>
+            <div class="variant-item">
+              <h4>Variant <%= index + 1 %>: <%= variant.size %> - <%= variant.color %></h4>
+              
+              <input type="hidden" name="variant_ids[]" value="<%= variant.variant_id %>">
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Size</label>
+                  <input type="text" name="variant_sizes[]" value="<%= variant.size %>" readonly>
+                </div>
+
+                <div class="form-group">
+                  <label>Color</label>
+                  <input type="text" name="variant_colors[]" value="<%= variant.color %>" readonly>
+                </div>
+
+                <div class="form-group">
+                  <label>Stock *</label>
+                  <input type="number" name="variant_stocks[]" value="<%= variant.stock %>" required>
+                </div>
+
+                <div class="form-group">
+                  <label>Price (Rs) *</label>
+                  <input type="number" name="variant_prices[]" value="<%= variant.price %>" required step="0.01">
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>No variants available</p>
+        <% } %>
+      </section>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Update Product
+        </button>
+        <a href="/admin/products" class="btn-secondary">Cancel</a>
+      </div>
+
+    </form>
+
+  </main>
+
+</div>
+
+<style>
+.product-form {
+  max-width: 900px;
+}
+
+.form-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-section h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.help-text {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-group small {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.variant-item {
+  border: 1px solid #e0e0e0;
+  padding: 1.5rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  background: #fafafa;
+}
+
+.variant-item h4 {
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+</style>
+
+</body>
+</html>

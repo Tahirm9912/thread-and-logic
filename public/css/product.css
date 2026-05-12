@@ -339,3 +339,29 @@ a:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* Thumbnail images */
+.thumbs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+.thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.thumb:hover {
+  border-color: #1a1a1a;
+}
+
+.thumb.active {
+  border-color: #1a1a1a;
+}

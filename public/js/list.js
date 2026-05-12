@@ -341,15 +341,9 @@ function updateCartCount() {
     .catch(err => console.error(err));
 }
 
-// ─── ADD TO CART (GLOBAL) ─────────────────────────────────────────────
-window.addToCart = function(productId, variantId) {
-  // Disable button to prevent double-click
-  const buttons = document.querySelectorAll(`button[onclick*="addToCart(${productId}, ${variantId})"]`);
-  buttons.forEach(btn => {
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-  });
+// ─── ADD TO CART (GLOBAL) ──────────────────────────────────────────
 
+window.addToCart = function(productId, variantId) {
   fetch("/cart/add", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -361,6 +355,11 @@ window.addToCart = function(productId, variantId) {
   })
   .then(res => {
     if (res.redirected) {
+      // If redirected to login, show modal instead
+      if (res.url.includes('/login')) {
+        showLoginModal();
+        return null;
+      }
       window.location.href = res.url;
       return null;
     }
@@ -370,33 +369,12 @@ window.addToCart = function(productId, variantId) {
     if (!data) return;
     
     if (data.success) {
-      // Animation
       addToCartAnimation();
-      
-      // Update cart count AND cart drawer content
       updateCartCount();
       updateCartDrawer();
-      
-      // Re-enable button
-      buttons.forEach(btn => {
-        btn.disabled = false;
-        btn.innerHTML = 'Add to Cart';
-      });
     } else {
       alert(data.message || "Error adding to cart");
-      buttons.forEach(btn => {
-        btn.disabled = false;
-        btn.innerHTML = 'Add to Cart';
-      });
     }
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Error adding to cart");
-    buttons.forEach(btn => {
-      btn.disabled = false;
-      btn.innerHTML = 'Add to Cart';
-    });
   });
 };
 

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - aynByHadiyaz</title>
-  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+    <title>Sign Up - Ayn By Hadiyaz</title>
+    <link rel="shortcut icon" href="/resources/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/css/signup.css">
     <link rel="stylesheet" href="/css/main.css">
-
+    <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
 </head>
 
 <body>
@@ -22,6 +22,9 @@
     <h2>Create Account</h2>
 
     <form action="/api/auth/register" method="POST" class="auth-form">
+
+      <!-- HIDDEN FIELD: Store returnUrl -->
+      <input type="hidden" name="returnUrl" value="<%= returnUrl %>">
 
       <!-- NAME -->
       <div class="form-group">
@@ -89,7 +92,7 @@
 
     <p class="auth-switch">
       Already have an account? 
-      <a href="/login">Sign In</a>
+      <a href="/login?returnUrl=<%= encodeURIComponent(returnUrl) %>">Sign In</a>
     </p>
 
   </div>

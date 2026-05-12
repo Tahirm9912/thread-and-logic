@@ -7,9 +7,72 @@ import { getAccountPage } from "../controllers/orderController.js";
 import { getPayoutPage } from "../controllers/payoutController.js";
 import { updateUser } from "../controllers/userController.js";
 import { submitContactForm } from "../controllers/contactController.js";
+import { 
+  verifyEmail,
+  forgotPassword,
+  resetPassword  
+} from "../controllers/authController.js";
 
 const router = express.Router();
 
+
+router.get("/", async (req, res) => {
+  try {
+    // Get settings
+    const settings = await pool.query(
+      "SELECT * FROM site_settings WHERE setting_key LIKE 'carousel_%' OR setting_key LIKE 'popup_%'"
+    );
+
+    const settingsObj = {};
+    settings.rows.forEach(s => {
+      settingsObj[s.setting_key] = s.setting_value;
+    });
+
+    // Get trending products
+    const trending = await pool.query(`
+      SELECT 
+        p.productid,
+        p.name,
+        p.price,
+        pv.variant_id,
+        pi.image_url,
+        pi.alt_text
+      FROM products p
+      JOIN LATERAL (
+        SELECT variant_id 
+        FROM product_variants 
+        WHERE product_id = p.productid 
+        LIMIT 1
+      ) pv ON true
+      LEFT JOIN product_images pi 
+        ON pi.product_id = p.productid AND pi.is_primary = true
+      WHERE p.is_trending = true AND p.is_active = true
+      LIMIT 8
+    `);
+
+    // NEW: Get active categories for homepage
+    const categories = await pool.query(`
+      SELECT * FROM product_categories 
+      WHERE is_active = true 
+      ORDER BY display_order ASC
+      LIMIT 6
+    `);
+
+    res.render("layouts/home", {
+      trendingProducts: trending.rows,
+      categories: categories.rows,  // NEW
+      settings: settingsObj
+    });
+
+  } catch (err) {
+    console.error("Home page error:", err);
+    res.render("layouts/home", {
+      trendingProducts: [],
+      categories: [],  // NEW
+      settings: {}
+    });
+  }
+});
 // ==========================
 // 🟢 API ENDPOINTS (MUST BE FIRST)
 // ==========================
@@ -48,50 +111,64 @@ router.get("/api/trending-products", async (req, res) => {
 // 🟢 PUBLIC PAGES
 // ==========================
 
-router.get("/", async (req, res) => {
-  try {
-    const settings = await pool.query(
-      "SELECT * FROM site_settings WHERE setting_key LIKE 'carousel_%' OR setting_key LIKE 'popup_%'"
-    );
+// router.get("/", async (req, res) => {
+//   try {
+//     const settings = await pool.query(
+//       "SELECT * FROM site_settings WHERE setting_key LIKE 'carousel_%' OR setting_key LIKE 'popup_%'"
+//     );
 
-    const settingsMap = {};
-    settings.rows.forEach(s => {
-      settingsMap[s.setting_key] = s.setting_value;
-    });
+//     const settingsMap = {};
+//     settings.rows.forEach(s => {
+//       settingsMap[s.setting_key] = s.setting_value;
+//     });
 
-    res.render("layouts/home", {
-      carousel_images: [
-        settingsMap.carousel_1 || '/images/a.webp',
-        settingsMap.carousel_2 || '/images/image 2.jpg',
-        settingsMap.carousel_3 || '/images/image 1.jpg',
-        settingsMap.carousel_4 || '/images/b.webp',
-        settingsMap.carousel_5 || '/images/image 5.webp'
-      ],
-      popup_image: settingsMap.popup_image || '/images/a.webp',
-      popup_enabled: settingsMap.popup_enabled === 'true'
-    });
-  } catch (err) {
-    console.error("Home page error:", err);
-    res.render("layouts/home", {
-      carousel_images: ['/images/a.webp', '/images/image 2.jpg', '/images/image 1.jpg', '/images/b.webp', '/images/image 5.webp'],
-      popup_image: '/images/a.webp',
-      popup_enabled: true
-    });
-  }
-});
+//     res.render("layouts/home", {
+//       carousel_images: [
+//         settingsMap.carousel_1 || '/images/a.webp',
+//         settingsMap.carousel_2 || '/images/image 2.jpg',
+//         settingsMap.carousel_3 || '/images/image 1.jpg',
+//         settingsMap.carousel_4 || '/images/b.webp',
+//         settingsMap.carousel_5 || '/images/image 5.webp'
+//       ],
+//       popup_image: settingsMap.popup_image || '/images/a.webp',
+//       popup_enabled: settingsMap.popup_enabled === 'true'
+//     });
+//   } catch (err) {
+//     console.error("Home page error:", err);
+//     res.render("layouts/home", {
+//       carousel_images: ['/images/a.webp', '/images/image 2.jpg', '/images/image 1.jpg', '/images/b.webp', '/images/image 5.webp'],
+//       popup_image: '/images/a.webp',
+//       popup_enabled: true
+//     });
+//   }
+// });
 
 router.get("/login", (req, res) => {
   if (req.user) {
     return res.redirect("/");
   }
-  res.render("layouts/login", { error: null });
+  
+  // Pass returnUrl to the login page
+  const returnUrl = req.query.returnUrl || '/';
+  
+  res.render("layouts/login", { 
+    error: null,
+    returnUrl: returnUrl
+  });
 });
 
 router.get("/signup", (req, res) => {
   if (req.user) {
     return res.redirect("/");
   }
-  res.render("layouts/signup", { error: null });
+  
+  // Pass returnUrl to signup page
+  const returnUrl = req.query.returnUrl || '/';
+  
+  res.render("layouts/signup", { 
+    error: null,
+    returnUrl: returnUrl
+  });
 });
 
 router.get("/contact", (req, res) => {
@@ -295,6 +372,94 @@ router.post("/buy-now", requireAuth, async (req, res) => {
 
 router.post("/contact/submit", submitContactForm);
 
+// Category page
+router.get("/category/:slug", async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    // Get category
+    const category = await pool.query(
+      "SELECT * FROM product_categories WHERE slug = $1 AND is_active = true",
+      [slug]
+    );
+
+    if (category.rows.length === 0) {
+      return res.status(404).render("layouts/404", { message: "Category not found" });
+    }
+
+    const cat = category.rows[0];
+
+    // Build search query from category's search_query
+    let query = `
+      SELECT 
+        p.productid,
+        p.name,
+        p.price,
+        p.tags,
+        pv.variant_id,
+        pi.image_url,
+        pi.alt_text
+      FROM products p
+      JOIN LATERAL (
+        SELECT variant_id 
+        FROM product_variants 
+        WHERE product_id = p.productid 
+        LIMIT 1
+      ) pv ON true
+      LEFT JOIN product_images pi 
+        ON pi.product_id = p.productid AND pi.is_primary = true
+      WHERE p.is_active = true
+    `;
+
+    const values = [];
+
+    // Use search_query from category
+    if (cat.search_query) {
+      const terms = cat.search_query.split(',').map(t => t.trim());
+      const conditions = terms.map((_, i) => `p.tags ILIKE $${i + 1}`).join(' OR ');
+      query += ` AND (${conditions})`;
+      values.push(...terms.map(t => `%${t}%`));
+    }
+
+    query += ` ORDER BY p.created_at DESC`;
+
+    const products = await pool.query(query, values);
+
+    res.render("layouts/list", {
+      products: products.rows,
+      activeTag: null,
+      searchQuery: null,
+      categoryName: cat.name,
+      breadcrumbs: [
+        { name: 'Home', url: '/' },
+        { name: cat.name, url: '' }
+      ]
+    });
+
+  } catch (err) {
+    console.error("Category page error:", err);
+    res.status(500).render("layouts/error", { message: "Could not load category" });
+  }
+});
+
+// Email verification
+router.get("/verify-email", verifyEmail);
+
+// Forgot password
+router.get("/forgot-password", (req, res) => {
+  res.render("layouts/forgot-password", { error: null, success: null });
+});
+router.post("/forgot-password", forgotPassword);
+
+// Reset password
+router.get("/reset-password", (req, res) => {
+  const { token } = req.query;
+  if (!token) {
+    return res.render("layouts/error", { message: "Invalid reset link" });
+  }
+  res.render("layouts/reset-password", { error: null, token });
+});
+router.post("/reset-password", resetPassword);
 
 
 

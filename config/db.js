@@ -1,20 +1,23 @@
-import { Pool } from "pg";
+import pg from "pg";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+const { Pool } = pg;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-// Test connection on startup
-pool.on('connect', () => {
-  console.log('✅ Database connected successfully');
+// Test connection
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error("❌ Database connection error:", err.stack);
+  } else {
+    console.log("✅ Database connected successfully");
+    release();
+  }
 });
 
-pool.on('error', (err) => {
-  console.error('❌ Unexpected database error:', err);
-  process.exit(-1);
-});
-
+// IMPORTANT: Default export
 export default pool;

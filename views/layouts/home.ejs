@@ -4,27 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>aynByHadiyaz - Premium Pakistani Fashion</title>
-  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/css/home.css">
     <link rel="stylesheet" href="/css/main.css">
-    
 </head>
 
 <body>
 
 <%- include('../partials/header') %>
 
-<!-- HERO -->
-<!-- HERO -->
+<!-- HERO CAROUSEL -->
 <section class="hero reveal">
   <div class="slider">
     <a href="/list">
       <div class="slides">
-        <% carousel_images.forEach((img, index) => { %>
-          <img src="<%= img %>" class="slide <%= index === 0 ? 'active' : '' %>" alt="Slide <%= index + 1 %>">
-        <% }) %>
+        <% 
+        // FIXED: Get carousel images from settings object
+        const carousel1 = settings['carousel_1'] || '';
+        const carousel2 = settings['carousel_2'] || '';
+        const carousel3 = settings['carousel_3'] || '';
+        const carousel4 = settings['carousel_4'] || '';
+        const carousel5 = settings['carousel_5'] || '';
+        
+        const carousel_images = [carousel1, carousel2, carousel3, carousel4, carousel5].filter(img => img && img.trim() !== '');
+        %>
+        
+        <% if (carousel_images.length > 0) { %>
+          <% carousel_images.forEach((img, index) => { %>
+            <img loading="lazy" src="<%= img %>" class="slide <%= index === 0 ? 'active' : '' %>" alt="Slide <%= index + 1 %>">
+          <% }) %>
+        <% } else { %>
+          <div style="background: #f0f0f0; height: 500px; display: flex; align-items: center; justify-content: center;">
+            <p style="color: #999;">No carousel images set. Add them in Admin Settings.</p>
+          </div>
+        <% } %>
       </div>
     </a>
     <button class="prev">&#10094;</button>
@@ -33,43 +48,58 @@
   </div>
 </section>
 
-<!-- Later in the file -->
-<% if (popup_enabled) { %>
-<div class="popup-overlay" id="popup">
-  <div class="popup-box">
-    <span class="popup-close" id="popupClose">&times;</span>
-    <img src="<%= popup_image %>" alt="Popup" class="popup-img">
-    <a href="/list" class="popup-btn">Shop Now</a>
-  </div>
-</div>
-<% } %>
-
 <!-- CATEGORIES -->
+<!-- CATEGORIES - NOW DYNAMIC -->
 <section class="categories reveal">
   <h2 class="cat-heading">Shop by Categories</h2>
-  <div class="cat-grid">
-    <a href="/list?tag=new" class="cat-item">
-      <div class="cat-circle"><img src="/images/image 1.jpg" alt="New Arrivals"></div>
-      <span>New Arrivals</span>
-    </a>
-    <a href="/list?tag=summer" class="cat-item">
-      <div class="cat-circle"><img src="/images/image 2.jpg" alt="Summer"></div>
-      <span>Summer Collection</span>
-    </a>
-    <a href="/list?tag=formal" class="cat-item">
-      <div class="cat-circle"><img src="/images/a.webp" alt="Formal"></div>
-      <span>Formal Wear</span>
-    </a>
-  </div>
+  
+  <% if (categories && categories.length > 0) { %>
+    <div class="cat-grid">
+      <% categories.forEach(cat => { %>
+        <a href="<%= cat.external_url || '/category/' + cat.slug %>" class="cat-item">
+          <div class="cat-circle">
+            <img loading="lazy" src="<%= cat.image_url || '/images/default.jpg' %>" alt="<%= cat.name %>">
+          </div>
+          <span><%= cat.name %></span>
+        </a>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p style="text-align: center; color: #999;">No categories available</p>
+  <% } %>
 </section>
 
-<!-- TRENDING -->
+<!-- TRENDING PRODUCTS -->
 <section class="trending reveal">
   <h2 class="trend-heading">Trending Now</h2>
 
   <div class="trend-grid" id="trendingProducts">
-    <!-- Products will load here -->
-    <p>Loading products...</p>
+    <% if (trendingProducts && trendingProducts.length > 0) { %>
+      <% trendingProducts.forEach(product => { %>
+        <div class="trend-card">
+          <a href="/product/<%= product.productid %>" class="trend-link">
+            <img src="<%= product.image_url || '/images/default.jpg' %>" alt="<%= product.alt_text || product.name %>">
+          </a>
+
+          <div class="trend-info">
+            <h3>
+              <a href="/product/<%= product.productid %>" class="trend-link"><%= product.name %></a>
+            </h3>
+
+            <p class="price">Rs <%= parseFloat(product.price).toFixed(0) %></p>
+
+            <div class="trend-actions">
+              <button onclick="quickAddToCart(<%= product.productid %>, <%= product.variant_id %>)" class="btn-cart">
+                Add to Cart
+              </button>
+              <a href="/product/<%= product.productid %>" class="btn-buy">View Details</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No trending products available</p>
+    <% } %>
   </div>
 </section>
 
@@ -78,57 +108,57 @@
 <%- include('../partials/search') %>
 <%- include('../partials/footer') %>
 
-<!-- POPUP -->
-<div class="popup-overlay" id="popup">
+<!-- POPUP MODAL -->
+<% 
+const popupEnabled = settings['popup_enabled'] === 'true';
+const popupImage = settings['popup_image'] || '';
+%>
+
+<% if (popupEnabled && popupImage) { %>
+<div class="popup-overlay" id="popup" style="display: none;">
   <div class="popup-box">
     <span class="popup-close" id="popupClose">&times;</span>
-    <img src="/images/a.webp" alt="Popup" class="popup-img">
+    <img src="<%= popupImage %>" alt="Special Offer" class="popup-img">
     <a href="/list" class="popup-btn">Shop Now</a>
   </div>
 </div>
 
+<script>
+// Show popup after 2 seconds
+window.addEventListener('load', function() {
+  const popup = document.getElementById('popup');
+  const popupClose = document.getElementById('popupClose');
+  const hasSeenPopup = sessionStorage.getItem('hasSeenPopup');
+  
+  if (!hasSeenPopup && popup) {
+    setTimeout(() => {
+      popup.style.display = 'flex';
+    }, 2000);
+  }
+
+  // Close popup
+  if (popupClose) {
+    popupClose.addEventListener('click', function() {
+      popup.style.display = 'none';
+      sessionStorage.setItem('hasSeenPopup', 'true');
+    });
+  }
+
+  // Close on overlay click
+  popup.addEventListener('click', function(e) {
+    if (e.target === popup) {
+      popup.style.display = 'none';
+      sessionStorage.setItem('hasSeenPopup', 'true');
+    }
+  });
+});
+</script>
+<% } %>
+
 <script src="/js/home.js"></script>
 
 <script>
-// Load trending products
-fetch('/api/trending-products')
-  .then(res => res.json())
-  .then(data => {
-    const container = document.getElementById('trendingProducts');
-    
-    if (data.products && data.products.length > 0) {
-      container.innerHTML = data.products.map(product => `
-        <div class="trend-card">
-          <a href="/product/${product.productid}" class="trend-link">
-            <img src="${product.image_url || '/images/default.jpg'}" alt="${product.name}">
-          </a>
-
-          <div class="trend-info">
-            <h3>
-              <a href="/product/${product.productid}" class="trend-link">${product.name}</a>
-            </h3>
-
-            <p class="price">Rs ${parseFloat(product.price).toFixed(0)}</p>
-
-            <div class="trend-actions">
-              <button onclick="quickAddToCart(${product.productid}, ${product.variant_id})" class="btn-cart">
-                Add to Cart
-              </button>
-              <a href="/product/${product.productid}" class="btn-buy">View Details</a>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    } else {
-      container.innerHTML = '<p>No trending products available</p>';
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    document.getElementById('trendingProducts').innerHTML = '<p>Error loading products</p>';
-  });
-
-// Quick add to cart
+// Quick add to cart function
 function quickAddToCart(productId, variantId) {
   if (!variantId) {
     window.location.href = `/product/${productId}`;
@@ -147,7 +177,7 @@ function quickAddToCart(productId, variantId) {
   .then(res => {
     if (res.redirected) {
       window.location.href = res.url;
-      return;
+      return null;
     }
     return res.json();
   })
@@ -155,8 +185,22 @@ function quickAddToCart(productId, variantId) {
     if (!data) return;
     
     if (data.success) {
-      addToCartAnimation();
-      setTimeout(() => location.reload(), 500);
+      // Animation (if you have addToCartAnimation function)
+      if (typeof addToCartAnimation === 'function') {
+        addToCartAnimation();
+      }
+      
+      // Update cart count
+      if (typeof updateCartCount === 'function') {
+        updateCartCount();
+      }
+      
+      // Update cart drawer
+      if (typeof updateCartDrawer === 'function') {
+        updateCartDrawer();
+      }
+      
+      alert('Added to cart!');
     } else {
       alert(data.message || 'Error adding to cart');
     }
@@ -167,6 +211,7 @@ function quickAddToCart(productId, variantId) {
   });
 }
 
+// Make function globally available
 window.quickAddToCart = quickAddToCart;
 </script>
 
