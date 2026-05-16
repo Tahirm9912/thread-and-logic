@@ -175,6 +175,76 @@ router.get("/contact", (req, res) => {
   res.render("layouts/contact");
 });
 
+// Category page
+router.get("/category/:slug", async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    // Get category
+    const category = await pool.query(
+      "SELECT * FROM product_categories WHERE slug = $1 AND is_active = true",
+      [slug]
+    );
+
+    if (category.rows.length === 0) {
+      return res.status(404).render("layouts/404", { message: "Category not found" });
+    }
+
+    const cat = category.rows[0];
+
+    // Build search query from category's search_query
+    let query = `
+      SELECT 
+        p.productid,
+        p.name,
+        p.price,
+        p.tags,
+        pv.variant_id,
+        pi.image_url,
+        pi.alt_text
+      FROM products p
+      JOIN LATERAL (
+        SELECT variant_id 
+        FROM product_variants 
+        WHERE product_id = p.productid 
+        LIMIT 1
+      ) pv ON true
+      LEFT JOIN product_images pi 
+        ON pi.product_id = p.productid AND pi.is_primary = true
+      WHERE p.is_active = true
+    `;
+
+    const values = [];
+
+    // Use search_query from category
+    if (cat.search_query) {
+      const terms = cat.search_query.split(',').map(t => t.trim());
+      const conditions = terms.map((_, i) => `p.tags ILIKE $${i + 1}`).join(' OR ');
+      query += ` AND (${conditions})`;
+      values.push(...terms.map(t => `%${t}%`));
+    }
+
+    query += ` ORDER BY p.created_at DESC`;
+
+    const products = await pool.query(query, values);
+
+    res.render("layouts/list", {
+      products: products.rows,
+      activeTag: null,
+      searchQuery: null,
+      categoryName: cat.name,
+      breadcrumbs: [
+        { name: 'Home', url: '/' },
+        { name: cat.name, url: '' }
+      ]
+    });
+
+  } catch (err) {
+    console.error("Category page error:", err);
+    res.status(500).render("layouts/error", { message: "Could not load category" });
+  }
+});
+
 // ==========================
 // 🟢 PRODUCT PAGES
 // ==========================
@@ -192,8 +262,7 @@ router.get("/payout", requireAuth, getPayoutPage);
 
 router.post("/user/update", requireAuth, updateUser);
 
-//Cart Count Controller
-// Add this with other API routes
+// Cart count API
 router.get("/api/cart-count", requireAuth, async (req, res) => {
   try {
     const userId = req.user.userid;
@@ -208,11 +277,11 @@ router.get("/api/cart-count", requireAuth, async (req, res) => {
     }
 
     const count = await pool.query(
-      "SELECT SUM(quantity) as total FROM cart_items WHERE cart_id = $1",
+      "SELECT COALESCE(SUM(quantity), 0) as total FROM cart_items WHERE cart_id = $1",
       [cart.rows[0].id]
     );
 
-    res.json({ count: parseInt(count.rows[0].total) || 0 });
+    res.json({ count: parseInt(count.rows[0].total) });
 
   } catch (err) {
     console.error(err);
@@ -220,9 +289,7 @@ router.get("/api/cart-count", requireAuth, async (req, res) => {
   }
 });
 
-
-
-// Add this with other API routes
+// Cart items API
 router.get("/api/cart-items", requireAuth, async (req, res) => {
   try {
     const userId = req.user.userid;
@@ -242,10 +309,11 @@ router.get("/api/cart-items", requireAuth, async (req, res) => {
         ci.quantity,
         p.productid,
         p.name,
-        p.price,
+        pv.price,
         pv.size,
         pv.color,
-        pi.image_url
+        pi.image_url,
+        pi.alt_text
       FROM cart_items ci
       JOIN products p ON ci.product_id = p.productid
       JOIN product_variants pv ON ci.variant_id = pv.variant_id
@@ -261,7 +329,6 @@ router.get("/api/cart-items", requireAuth, async (req, res) => {
     res.json({ items: [] });
   }
 });
-
 
 
 //order Details
@@ -372,75 +439,7 @@ router.post("/buy-now", requireAuth, async (req, res) => {
 
 router.post("/contact/submit", submitContactForm);
 
-// Category page
-router.get("/category/:slug", async (req, res) => {
-  try {
-    const { slug } = req.params;
 
-    // Get category
-    const category = await pool.query(
-      "SELECT * FROM product_categories WHERE slug = $1 AND is_active = true",
-      [slug]
-    );
-
-    if (category.rows.length === 0) {
-      return res.status(404).render("layouts/404", { message: "Category not found" });
-    }
-
-    const cat = category.rows[0];
-
-    // Build search query from category's search_query
-    let query = `
-      SELECT 
-        p.productid,
-        p.name,
-        p.price,
-        p.tags,
-        pv.variant_id,
-        pi.image_url,
-        pi.alt_text
-      FROM products p
-      JOIN LATERAL (
-        SELECT variant_id 
-        FROM product_variants 
-        WHERE product_id = p.productid 
-        LIMIT 1
-      ) pv ON true
-      LEFT JOIN product_images pi 
-        ON pi.product_id = p.productid AND pi.is_primary = true
-      WHERE p.is_active = true
-    `;
-
-    const values = [];
-
-    // Use search_query from category
-    if (cat.search_query) {
-      const terms = cat.search_query.split(',').map(t => t.trim());
-      const conditions = terms.map((_, i) => `p.tags ILIKE $${i + 1}`).join(' OR ');
-      query += ` AND (${conditions})`;
-      values.push(...terms.map(t => `%${t}%`));
-    }
-
-    query += ` ORDER BY p.created_at DESC`;
-
-    const products = await pool.query(query, values);
-
-    res.render("layouts/list", {
-      products: products.rows,
-      activeTag: null,
-      searchQuery: null,
-      categoryName: cat.name,
-      breadcrumbs: [
-        { name: 'Home', url: '/' },
-        { name: cat.name, url: '' }
-      ]
-    });
-
-  } catch (err) {
-    console.error("Category page error:", err);
-    res.status(500).render("layouts/error", { message: "Could not load category" });
-  }
-});
 
 // Email verification
 router.get("/verify-email", verifyEmail);

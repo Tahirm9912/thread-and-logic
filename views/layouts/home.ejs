@@ -48,15 +48,14 @@
   </div>
 </section>
 
-<!-- CATEGORIES -->
-<!-- CATEGORIES - NOW DYNAMIC -->
+<!-- CATEGORIES - USE SLUG AS TAG -->
 <section class="categories reveal">
   <h2 class="cat-heading">Shop by Categories</h2>
   
   <% if (categories && categories.length > 0) { %>
     <div class="cat-grid">
       <% categories.forEach(cat => { %>
-        <a href="<%= cat.external_url || '/category/' + cat.slug %>" class="cat-item">
+        <a href="/list?tag=<%= cat.slug %>" class="cat-item">
           <div class="cat-circle">
             <img loading="lazy" src="<%= cat.image_url || '/images/default.jpg' %>" alt="<%= cat.name %>">
           </div>
@@ -158,12 +157,18 @@ window.addEventListener('load', function() {
 <script src="/js/home.js"></script>
 
 <script>
-// Quick add to cart function
+// Quick add to cart function - IMPROVED
 function quickAddToCart(productId, variantId) {
   if (!variantId) {
     window.location.href = `/product/${productId}`;
     return;
   }
+
+  // Disable button
+  const button = event.target;
+  const originalText = button.innerHTML;
+  button.disabled = true;
+  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
   fetch('/cart/add', {
     method: 'POST',
@@ -185,35 +190,54 @@ function quickAddToCart(productId, variantId) {
     if (!data) return;
     
     if (data.success) {
-      // Animation (if you have addToCartAnimation function)
+      // 1. Play sound and animation
       if (typeof addToCartAnimation === 'function') {
         addToCartAnimation();
       }
       
-      // Update cart count
+      // 2. Update cart count badge
       if (typeof updateCartCount === 'function') {
         updateCartCount();
       }
       
-      // Update cart drawer
+      // 3. Update cart drawer content
       if (typeof updateCartDrawer === 'function') {
         updateCartDrawer();
       }
       
-      alert('Added to cart!');
+      // 4. Show success notification
+      if (typeof showNotification === 'function') {
+        showNotification('Added to cart!');
+      } else {
+        // Fallback if notification function not available
+        const tempMsg = document.createElement('div');
+        tempMsg.style.cssText = 'position:fixed;top:20px;right:20px;background:#28a745;color:white;padding:15px 25px;border-radius:5px;z-index:99999;box-shadow:0 4px 8px rgba(0,0,0,0.2);';
+        tempMsg.textContent = 'Added to cart!';
+        document.body.appendChild(tempMsg);
+        setTimeout(() => tempMsg.remove(), 2000);
+      }
+
+      // Re-enable button
+      button.disabled = false;
+      button.innerHTML = originalText;
     } else {
       alert(data.message || 'Error adding to cart');
+      button.disabled = false;
+      button.innerHTML = originalText;
     }
   })
   .catch(err => {
     console.error(err);
     alert('Error adding to cart');
+    button.disabled = false;
+    button.innerHTML = originalText;
   });
 }
 
 // Make function globally available
 window.quickAddToCart = quickAddToCart;
 </script>
+
 
 </body>
 </html>

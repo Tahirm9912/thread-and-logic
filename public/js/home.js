@@ -260,3 +260,118 @@ window.buyNow = function(productId, variantId) {
     alert("Error processing purchase");
   });
 };
+
+// ─── UPDATE CART COUNT (NO RELOAD) ────────────────────────────────────
+function updateCartCount() {
+  fetch('/api/cart-count')
+    .then(res => res.json())
+    .then(data => {
+      const badge = document.querySelector('.cart-badge');
+      const wrapper = document.querySelector('.cart-wrapper');
+      
+      if (data.count > 0) {
+        if (badge) {
+          badge.textContent = data.count;
+        } else if (wrapper) {
+          const newBadge = document.createElement('span');
+          newBadge.className = 'cart-badge';
+          newBadge.textContent = data.count;
+          wrapper.appendChild(newBadge);
+        }
+        if (wrapper) wrapper.classList.add('active');
+      } else {
+        if (badge) badge.remove();
+        if (wrapper) wrapper.classList.remove('active');
+      }
+    })
+    .catch(err => console.error('Cart count update error:', err));
+}
+
+// ─── UPDATE CART DRAWER CONTENT ───────────────────────────────────────
+function updateCartDrawer() {
+  fetch('/api/cart-items')
+    .then(res => res.json())
+    .then(data => {
+      const cartBody = document.querySelector('.cart-drawer .cart-body');
+      
+      if (!cartBody) return;
+
+      if (data.items && data.items.length > 0) {
+        cartBody.innerHTML = data.items.map(item => `
+          <div class="cart-item">
+            <img src="${item.image_url || '/images/default.jpg'}" alt="${item.name}">
+            <div class="cart-item-info">
+              <h4>${item.name}</h4>
+              <p>${item.size} • ${item.color}</p>
+              <p class="cart-price">Rs ${parseFloat(item.price).toFixed(0)}</p>
+            </div>
+            <div class="cart-qty">
+              <span>Qty: ${item.quantity}</span>
+            </div>
+          </div>
+        `).join('');
+
+        // Update footer
+        let footer = document.querySelector('.cart-drawer .cart-footer');
+        if (!footer) {
+          footer = document.createElement('div');
+          footer.className = 'cart-footer';
+          document.querySelector('.cart-drawer').appendChild(footer);
+        }
+        footer.innerHTML = '<a href="/checkout" class="cart-checkout-btn">Checkout</a>';
+      } else {
+        cartBody.innerHTML = `
+          <div class="cart-empty">
+            <i class="fas fa-shopping-bag"></i>
+            <p>Your cart is empty</p>
+          </div>
+        `;
+
+        const footer = document.querySelector('.cart-drawer .cart-footer');
+        if (footer) footer.remove();
+      }
+    })
+    .catch(err => console.error('Cart drawer update error:', err));
+}
+
+// ─── SHOW NOTIFICATION ────────────────────────────────────────────────
+function showNotification(message) {
+  // Remove existing notification
+  const existing = document.querySelector('.cart-notification');
+  if (existing) existing.remove();
+
+  // Create notification
+  const notification = document.createElement('div');
+  notification.className = 'cart-notification';
+  notification.innerHTML = `
+    <i class="fas fa-check-circle"></i>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(notification);
+
+  // Show notification
+  setTimeout(() => {
+    notification.classList.add('show');
+  }, 100);
+
+  // Hide and remove after 3 seconds
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+// Make functions globally available
+window.updateCartCount = updateCartCount;
+window.updateCartDrawer = updateCartDrawer;
+window.showNotification = showNotification;
+
+
+
+
+// Add at bottom of home.js
+console.log('Home.js loaded');
+console.log('updateCartCount available:', typeof updateCartCount);
+console.log('updateCartDrawer available:', typeof updateCartDrawer);
+console.log('showNotification available:', typeof showNotification);

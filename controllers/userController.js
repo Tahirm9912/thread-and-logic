@@ -7,7 +7,7 @@ export const updateUser = async (req, res) => {
 
     console.log('Update user request:', { userId, email, tel, address, postal_code });
 
-    // Validate email if provided
+    // Validate email
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
@@ -31,7 +31,7 @@ export const updateUser = async (req, res) => {
       }
     }
 
-    // Build update query dynamically
+    // Build update query
     const updates = [];
     const values = [];
     let paramCount = 0;
@@ -42,19 +42,19 @@ export const updateUser = async (req, res) => {
       values.push(email);
     }
 
-    if (tel) {
+    if (tel !== undefined) {
       paramCount++;
       updates.push(`tel = $${paramCount}`);
       values.push(tel);
     }
 
-    if (address) {
+    if (address !== undefined) {
       paramCount++;
       updates.push(`address = $${paramCount}`);
       values.push(address);
     }
 
-    if (postal_code) {
+    if (postal_code !== undefined) {
       paramCount++;
       updates.push(`postal_code = $${paramCount}`);
       values.push(postal_code);
@@ -72,7 +72,8 @@ export const updateUser = async (req, res) => {
 
     const query = `UPDATE users SET ${updates.join(', ')} WHERE userid = $${paramCount}`;
     
-    console.log('Running query:', query, values);
+    console.log('Running query:', query);
+    console.log('With values:', values);
 
     await pool.query(query, values);
 
@@ -85,7 +86,7 @@ export const updateUser = async (req, res) => {
     console.error("Update user error:", err);
     return res.status(500).json({ 
       success: false, 
-      message: "Server error" 
+      message: "Server error: " + err.message 
     });
   }
 };
