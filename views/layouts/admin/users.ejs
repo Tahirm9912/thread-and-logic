@@ -43,7 +43,7 @@
             <td><%= user.tel || 'N/A' %></td>
             <td><%= new Date(user.created_at).toLocaleDateString() %></td>
             <td>
-              <span class="badge <%= user.is_admin ? 'admin' : 'user' %>">
+              <span class="badge">
                 <%= user.email_verified ? 'Verified' : 'Not Verified' %>
               </span>
             </td>

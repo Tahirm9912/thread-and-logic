@@ -19,37 +19,60 @@ export const generateToken = () => {
 export const sendVerificationEmail = async (email, name, token) => {
   const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
   const verificationUrl = `${baseUrl}/verify-email?token=${token}`;
-console.log(verificationUrl)
+  console.log('📧 Verification URL:', verificationUrl);
   const mailOptions = {
     from: `"aynByHadiyaz" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: 'Verify Your Email - aynByHadiyaz',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1a1a1a;">Welcome to aynByHadiyaz, ${name}!</h2>
-        <p>Thank you for registering. Please verify your email address by clicking the button below:</p>
+        <h2 style="color: #1a1a1a;">
+          Welcome to aynByHadiyaz, ${name}!
+        </h2>
+        <p>
+          Thank you for registering. Please verify your email address by clicking the button below:
+        </p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${verificationUrl}" 
-             style="background: #1a1a1a; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+             style="
+               background: #1a1a1a;
+               color: white;
+               padding: 12px 30px;
+               text-decoration: none;
+               border-radius: 5px;
+               display: inline-block;
+             ">
             Verify Email
           </a>
         </div>
-        <p>Or copy and paste this link in your browser:</p>
-        <p style="color: #666; word-break: break-all;">${verificationUrl}</p>
-        <p style="color: #999; font-size: 12px; margin-top: 30px;">
-          This link will expire in 24 hours. If you didn't create an account, please ignore this email.
+        <p>
+          Or copy and paste this link in your browser:
         </p>
+        <p style="color: #666; word-break: break-all;">
+          ${verificationUrl}
+        </p>
+
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">
+          This link will expire in 24 hours.
+          If you didn't create an account, please ignore this email.
+        </p>
+
       </div>
     `
   };
 
   try {
+
     await transporter.sendMail(mailOptions);
+
     console.log('✅ Verification email sent to:', email);
-    console.log('📧 Verification URL:', verificationUrl);
+
     return true;
+
   } catch (err) {
+
     console.error('❌ Email send error:', err);
+
     return false;
   }
 };

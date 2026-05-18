@@ -34,7 +34,7 @@
           <th>Amount</th>
           <th>Payment</th>
           <th>Status</th>
-          <th>Verified</th>
+          <th>Verification</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -97,7 +97,7 @@
             </td>
 
             <td>
-              <span class="badge <%= order.email_verified ? 'admin' : 'user' %>">
+              <span class="badge">
                 <%= order.email_verified ? 'Verified' : 'Not Verified' %>
               </span>
             </td>
