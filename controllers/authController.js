@@ -106,9 +106,7 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password, returnUrl } = req.body;
 
-    console.log('=== LOGIN DEBUG ===');
-    console.log('Email:', email);
-    console.log('ReturnUrl from body:', returnUrl);
+
 
     if (!email || !password) {
       return res.render("layouts/login", {
@@ -162,8 +160,7 @@ export const loginUser = async (req, res) => {
       }
     }
 
-    console.log('Redirecting to:', redirectTo);
-    console.log('===================');
+
     
     return res.redirect(redirectTo);
 
