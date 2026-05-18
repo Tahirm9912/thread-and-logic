@@ -91,9 +91,10 @@ export const getAdminOrders = async (req, res) => {
     const orders = await pool.query(`
       SELECT 
         o.*,
-        u.name as user_name,
-        u.email as user_email,
-        u.tel as user_phone
+        u.name AS user_name,
+        u.email AS user_email,
+        u.tel AS user_phone,
+        u.email_verified
       FROM orders o
       JOIN users u ON o.user_id = u.userid
       ORDER BY o.created_at DESC
@@ -105,6 +106,7 @@ export const getAdminOrders = async (req, res) => {
 
   } catch (err) {
     console.error("Admin orders error:", err);
+
     return res.status(500).render("layouts/error", {
       message: "Could not load orders"
     });

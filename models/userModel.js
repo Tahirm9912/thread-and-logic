@@ -55,7 +55,7 @@ export const findUserById = async (userid) => {
 // ==========================
 export const getAllUsers = async () => {
   const result = await pool.query(
-    `SELECT userid, name, email, tel, address, created_at, is_admin
+    `SELECT userid, name, email, tel, address, created_at, is_admin, email_verified
      FROM users 
      ORDER BY created_at DESC`
   );

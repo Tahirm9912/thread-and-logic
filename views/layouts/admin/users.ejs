@@ -31,7 +31,7 @@
           <th>Email</th>
           <th>Phone</th>
           <th>Joined</th>
-          <th>Role</th>
+          <th>Verification</th>
         </tr>
       </thead>
       <tbody>
@@ -44,7 +44,7 @@
             <td><%= new Date(user.created_at).toLocaleDateString() %></td>
             <td>
               <span class="badge <%= user.is_admin ? 'admin' : 'user' %>">
-                <%= user.is_admin ? 'Admin' : 'User' %>
+                <%= user.email_verified ? 'Verified' : 'Not Verified' %>
               </span>
             </td>
           </tr>

@@ -19,7 +19,7 @@ export const generateToken = () => {
 export const sendVerificationEmail = async (email, name, token) => {
   const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
   const verificationUrl = `${baseUrl}/verify-email?token=${token}`;
-
+console.log(verificationUrl)
   const mailOptions = {
     from: `"aynByHadiyaz" <${process.env.EMAIL_USER}>`,
     to: email,
