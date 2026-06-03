@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Categories</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin-main.css">
+</head>
+<body>
+
+<%- include('../../partials/admin-header') %>
+
+<div class="admin-container">
+  
+  <%- include('../../partials/admin-sidebar') %>
+
+  <main class="admin-main">
+    
+    <div class="page-header">
+      <h1>Product Categories</h1>
+      <button onclick="showAddForm()" class="btn-primary" id="addBtn">
+        <i class="fas fa-plus"></i> Add Category
+      </button>
+    </div>
+
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="alert alert-success">Category saved successfully!</div>
+    <% } %>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error">Error saving category</div>
+    <% } %>
+
+    <!-- ADD/EDIT FORM -->
+    <div id="categoryForm" class="form-card" style="display: <%= editCategory ? 'block' : 'none' %>;">
+      <h3 id="formTitle"><%= editCategory ? 'Edit Category' : 'Add New Category' %></h3>
+      
+      <form action="<%= editCategory ? '/admin/categories/update/' + editCategory.id : '/admin/categories/add' %>" method="POST">
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category Name *</label>
+            <input type="text" name="name" required placeholder="e.g., New Arrivals" value="<%= editCategory ? editCategory.name : '' %>">
+          </div>
+
+          <div class="form-group">
+            <label>Slug (URL) *</label>
+            <input type="text" name="slug" required placeholder="e.g., new-arrivals" value="<%= editCategory ? editCategory.slug : '' %>">
+            <small>Used in URL: /category/slug-name</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Image URL</label>
+            <input type="text" name="image_url" placeholder="/images/categories/category.jpg" value="<%= editCategory ? editCategory.image_url || '' : '' %>">
+            <small>Image for category circle on homepage</small>
+          </div>
+
+          <div class="form-group">
+            <label>External URL (Optional)</label>
+            <input type="text" name="external_url" placeholder="https://example.com or leave empty for /category/slug" value="<%= editCategory ? editCategory.external_url || '' : '' %>">
+            <small>Leave empty to use /category/slug</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Search Query</label>
+          <input type="text" name="search_query" placeholder="e.g., new,latest,recent" value="<%= editCategory ? editCategory.search_query || '' : '' %>">
+          <small>Comma-separated tags to auto-filter products</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Display Order</label>
+            <input type="number" name="display_order" value="<%= editCategory ? editCategory.display_order : 0 %>">
+            <small>Lower numbers appear first</small>
+          </div>
+
+          <% if (editCategory) { %>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="is_active" <%= editCategory.is_active ? 'checked' : '' %>>
+                <span>Active (show on website)</span>
+              </label>
+            </div>
+          <% } %>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-save"></i> <%= editCategory ? 'Update' : 'Create' %> Category
+          </button>
+          <button type="button" onclick="hideForm()" class="btn-secondary">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- CATEGORIES LIST -->
+    <div class="categories-grid">
+      <% categories.forEach(cat => { %>
+        <div class="category-card">
+          <div class="category-header">
+            <h3><%= cat.name %></h3>
+            <span class="badge <%= cat.is_active ? 'badge-success' : 'badge-danger' %>">
+              <%= cat.is_active ? 'Active' : 'Inactive' %>
+            </span>
+          </div>
+
+          <% if (cat.image_url) { %>
+            <div class="category-image">
+              <img src="<%= cat.image_url %>" alt="<%= cat.name %>" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
+            </div>
+          <% } %>
+
+          <p><strong>Slug:</strong> /category/<%= cat.slug %></p>
+          <p><strong>Search Query:</strong> <%= cat.search_query || 'None' %></p>
+          <p><strong>Display Order:</strong> <%= cat.display_order %></p>
+
+          <div class="category-actions">
+            <a href="/admin/categories/edit/<%= cat.id %>" class="btn-sm btn-primary">
+              <i class="fas fa-edit"></i> Edit
+            </a>
+            <button onclick="deleteCategory(<%= cat.id %>)" class="btn-sm btn-danger">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+  </main>
+
+</div>
+
+<style>
+.form-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.category-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.category-image {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.category-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+</style>
+
+<script>
+function showAddForm() {
+  document.getElementById('categoryForm').style.display = 'block';
+  document.getElementById('formTitle').textContent = 'Add New Category';
+  document.getElementById('addBtn').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function hideForm() {
+  document.getElementById('categoryForm').style.display = 'none';
+  document.getElementById('addBtn').style.display = 'inline-flex';
+}
+
+function deleteCategory(id) {
+  if (!confirm('Delete this category? This cannot be undone.')) return;
+
+  fetch(`/admin/categories/${id}`, {
+    method: 'DELETE'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('Error deleting category');
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Error deleting category');
+  });
+}
+</script>
+
+</body>
+</html>

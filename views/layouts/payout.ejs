@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - aynByHadiyaz</title>
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/payout.css">
+    <link rel="stylesheet" href="/css/main.css">
+
+</head>
+
+<body>
+
+<%- include('../partials/header-nscm') %>
+
+<section class="payment-page">
+
+  <h2 class="payment-title">Payment</h2>
+
+  <div class="payment-container">
+
+    <!-- LEFT -->
+    <div class="payment-left">
+
+      <h3>Select Payment Method</h3>
+
+      <label class="pay-option">
+        <input type="radio" name="pay" value="COD" checked>
+        Cash on Delivery
+      </label>
+
+      <label class="pay-option">
+        <input type="radio" name="pay" value="easypaisa">
+        Easypaisa
+      </label>
+
+      <div id="qrBox" style="display:none; margin-top:20px;">
+        <p>Scan QR & pay via Easypaisa</p>
+        <img src="/images/qrCode.jpg" width="200" alt="QR Code">
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="payment-right">
+
+      <h3>Order Summary</h3>
+
+      <div class="summary-item">
+        <span>Subtotal</span>
+        <span>Rs <%= order ? parseFloat(order.total_amount).toFixed(0) : 0 %></span>
+      </div>
+
+      <div class="summary-item">
+        <span>Delivery</span>
+        <span>Rs 200</span>
+      </div>
+
+      <hr>
+
+      <div class="summary-total">
+        <span>Total</span>
+        <span>Rs <%= order ? (parseFloat(order.total_amount) + 200).toFixed(0) : 200 %></span>
+      </div>
+
+      <button onclick="confirmOrder(<%= order ? order.id : 0 %>)" class="pay-btn">
+        Confirm Order
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+<%- include('../partials/menubar') %>
+<%- include('../partials/cart') %>
+<%- include('../partials/footer') %>
+
+<script src="/js/payout.js"></script>
+
+</body>
+</html>

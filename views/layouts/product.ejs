@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= product.name %> - aynByHadiyaz</title>
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/css/product.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta name="<%= product.name %>" content="<%= product.description %>" />
+</head>
+
+<body>
+
+<%- include('../partials/header-ns') %>
+<%- include("../partials/breadcrumb") %>
+
+<section class="product-page">
+
+  <!-- LEFT SIDE - IMAGES -->
+  <div class="product-images">
+    
+    <!-- MAIN IMAGE -->
+    <div class="main-image">
+      <% if (images && images.length > 0) { %>
+        <img id="mainImg" src="<%= images[0].image_url %>" alt="<%= images[0].alt_text || product.name %>">
+      <% } else { %>
+        <img id="mainImg" src="/images/default.jpg" alt="<%= product.name %>">
+      <% } %>
+    </div>
+
+    <!-- THUMBNAIL IMAGES -->
+    <% if (images && images.length > 0) { %>
+      <div class="thumbs">
+        <% images.forEach((img, index) => { %>
+          <img 
+            src="<%= img.image_url %>" 
+            alt="<%= img.alt_text || product.name %>"
+            class="thumb <%= index === 0 ? 'active' : '' %>"
+            onclick="changeImage(this)">
+        <% }) %>
+      </div>
+    <% } %>
+
+  </div>
+
+  <!-- RIGHT SIDE - INFO -->
+  <div class="product-info">
+    <!-- rest of product info ... -->
+
+    <h1><%= product.name %></h1>
+
+<p id="price">Select options</p>
+
+<!-- STOCK STATUS -->
+<p id="stockStatus" class="stock-status"></p>
+
+<p><%= product.description %></p>
+
+    <% if (product.tags && product.tags.length > 0) { %>
+      <div class="product-tags">
+        <% product.tags.forEach(tag => { %>
+          <a href="/list?tag=<%= tag %>" class="tag">
+            <%= tag %>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <div class="product-options">
+
+      <!-- SIZE -->
+      <label>Size</label>
+      <select id="sizeSelect">
+        <% [...new Set(variants.map(v => v.size))].forEach(size => { %>
+          <option value="<%= size %>"><%= size %></option>
+        <% }) %>
+      </select>
+
+      <!-- COLOR -->
+      <label>Color</label>
+      <select id="colorSelect">
+        <% [...new Set(variants.map(v => v.color))].forEach(color => { %>
+          <option value="<%= color %>"><%= color %></option>
+        <% }) %>
+      </select>
+
+      <!-- QUANTITY -->
+      <label>Quantity</label>
+      <div class="qty-box">
+        <button type="button" onclick="changeQty(-1)">-</button>
+        <input type="number" id="qty" value="1" min="1">
+        <button type="button" onclick="changeQty(1)">+</button>
+      </div>
+
+    </div>
+
+    <div class="product-actions">
+      <button id="addToCartBtn" class="btn-cart">Add to Cart</button>
+      <button id="buyNowBtn" class="btn-buy">Buy Now</button>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- RELATED PRODUCTS -->
+<% if (relatedProducts && relatedProducts.length > 0) { %>
+<section class="related-products">
+  <h2>You May Also Like</h2>
+  
+  <div class="related-grid">
+    <% relatedProducts.forEach(product => { %>
+      <div class="related-card">
+        <a href="/product/<%= product.productid %>">
+          <img src="<%= product.image_url || '/images/default.jpg' %>" alt="<%= product.name %>">
+          <h3><%= product.name %></h3>
+          <p class="price">Rs <%= parseFloat(product.price).toFixed(0) %></p>
+        </a>
+      </div>
+    <% }) %>
+  </div>
+</section>
+<% } %>
+
+<%- include('../partials/menubar') %>
+<%- include('../partials/cart') %>
+<%- include('../partials/search') %>
+<%- include('../partials/footer') %>
+
+<script>
+  const variants = <%- JSON.stringify(variants) %>;
+
+  const sizeSelect = document.getElementById("sizeSelect");
+  const colorSelect = document.getElementById("colorSelect");
+  const priceEl = document.getElementById("price");
+  const qtyInput = document.getElementById("qty");
+  const addToCartBtn = document.getElementById("addToCartBtn");
+  const buyNowBtn = document.getElementById("buyNowBtn");
+
+  // UPDATE PRICE
+function updateVariant() {
+  const variant = variants.find(v =>
+    v.size === sizeSelect.value &&
+    v.color === colorSelect.value
+  );
+
+  const stockStatus = document.getElementById('stockStatus');
+
+  if (variant) {
+    priceEl.innerText = "Rs " + parseFloat(variant.price).toFixed(0);
+    
+    // Show stock status
+    if (variant.stock > 10) {
+      stockStatus.innerHTML = '<span style="color: green;"><i class="fas fa-check-circle"></i> In Stock</span>';
+    } else if (variant.stock > 0) {
+      stockStatus.innerHTML = `<span style="color: orange;"><i class="fas fa-exclamation-triangle"></i> Only ${variant.stock} left!</span>`;
+    } else {
+      stockStatus.innerHTML = '<span style="color: red;"><i class="fas fa-times-circle"></i> Out of Stock</span>';
+    }
+  } else {
+    priceEl.innerText = "Not available";
+    stockStatus.innerHTML = '<span style="color: red;">Combination not available</span>';
+  }
+}
+
+  sizeSelect.addEventListener("change", updateVariant);
+  colorSelect.addEventListener("change", updateVariant);
+
+  updateVariant();
+
+  // GET SELECTED VARIANT
+  function getVariant() {
+    return variants.find(v =>
+      v.size === sizeSelect.value &&
+      v.color === colorSelect.value
+    );
+  }
+
+  // ADD TO CART
+  addToCartBtn.addEventListener('click', function() {
+    const variant = getVariant();
+
+    if (!variant) {
+      alert("Please choose correct size and color");
+      return;
+    }
+
+    const quantity = parseInt(qtyInput.value);
+
+    // Disable button
+    addToCartBtn.disabled = true;
+    addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+    fetch("/cart/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product_id: variant.product_id,
+        variant_id: variant.variant_id,
+        quantity: quantity
+      })
+    })
+    .then(res => {
+      if (res.redirected) {
+        window.location.href = res.url;
+        return null;
+      }
+      return res.json();
+    })
+    .then(data => {
+      if (!data) return;
+
+      if (data.success) {
+        // Animation
+        if (typeof addToCartAnimation === 'function') {
+          addToCartAnimation();
+        }
+        
+        // Update cart count
+        if (typeof updateCartCount === 'function') {
+          updateCartCount();
+        }
+        
+        // Update cart drawer
+        if (typeof updateCartDrawer === 'function') {
+          updateCartDrawer();
+        }
+
+        // Re-enable button
+        addToCartBtn.disabled = false;
+        addToCartBtn.innerHTML = 'Add to Cart';
+      } else {
+        alert(data.message);
+        addToCartBtn.disabled = false;
+        addToCartBtn.innerHTML = 'Add to Cart';
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      alert('Error adding to cart');
+      addToCartBtn.disabled = false;
+      addToCartBtn.innerHTML = 'Add to Cart';
+    });
+  });
+
+  // BUY NOW
+  buyNowBtn.addEventListener('click', function() {
+    const variant = getVariant();
+
+    if (!variant) {
+      alert("Please select size and color");
+      return;
+    }
+
+    const quantity = parseInt(qtyInput.value);
+
+    // Disable button
+    buyNowBtn.disabled = true;
+    buyNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+    fetch("/cart/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product_id: variant.product_id,
+        variant_id: variant.variant_id,
+        quantity: quantity
+      })
+    })
+    .then(res => {
+      if (res.redirected) {
+        window.location.href = res.url;
+        return null;
+      }
+      return res.json();
+    })
+    .then(data => {
+      if (!data) return;
+
+      if (data.success) {
+        window.location.href = '/checkout';
+      } else {
+        alert(data.message);
+        buyNowBtn.disabled = false;
+        buyNowBtn.innerHTML = 'Buy Now';
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      alert('Error processing purchase');
+      buyNowBtn.disabled = false;
+      buyNowBtn.innerHTML = 'Buy Now';
+    });
+  });
+
+  // IMAGE SWITCH
+  function changeImage(el) {
+    document.getElementById("mainImg").src = el.src;
+    document.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
+    el.classList.add("active");
+  }
+
+  // QTY
+  function changeQty(val) {
+    let v = parseInt(qtyInput.value);
+    v += val;
+    if (v < 1) v = 1;
+    qtyInput.value = v;
+  }
+
+  // Update cart count without reload
+  function updateCartCount() {
+    fetch('/api/cart-count')
+      .then(res => res.json())
+      .then(data => {
+        const badge = document.querySelector('.cart-badge');
+        const wrapper = document.querySelector('.cart-wrapper');
+        
+        if (data.count > 0) {
+          if (badge) {
+            badge.textContent = data.count;
+          } else {
+            const newBadge = document.createElement('span');
+            newBadge.className = 'cart-badge';
+            newBadge.textContent = data.count;
+            wrapper.appendChild(newBadge);
+          }
+          wrapper.classList.add('active');
+        }
+      })
+      .catch(err => console.error(err));
+  }
+
+  // Update cart drawer
+  function updateCartDrawer() {
+    fetch('/api/cart-items')
+      .then(res => res.json())
+      .then(data => {
+        const cartBody = document.querySelector('.cart-drawer .cart-body');
+        
+        if (!cartBody) return;
+
+        if (data.items && data.items.length > 0) {
+          cartBody.innerHTML = data.items.map(item => `
+            <div class="cart-item">
+              <img src="${item.image_url || '/images/default.jpg'}" alt="${item.name}">
+              <div class="cart-item-info">
+                <h4>${item.name}</h4>
+                <p>${item.size} • ${item.color}</p>
+                <p class="cart-price">Rs ${parseFloat(item.price).toFixed(0)}</p>
+              </div>
+              <div class="cart-qty">
+                <span>Qty: ${item.quantity}</span>
+              </div>
+            </div>
+          `).join('');
+
+          let footer = document.querySelector('.cart-drawer .cart-footer');
+          if (!footer) {
+            footer = document.createElement('div');
+            footer.className = 'cart-footer';
+            document.querySelector('.cart-drawer').appendChild(footer);
+          }
+          footer.innerHTML = '<a href="/checkout" class="cart-checkout-btn">Checkout</a>';
+        }
+      })
+      .catch(err => console.error(err));
+  }
+
+  // Cart animation
+  function addToCartAnimation() {
+    const cartIcon = document.querySelector('.cart-icon');
+    const cartWrapper = document.querySelector('.cart-wrapper');
+    
+    if (!cartIcon) return;
+
+    cartIcon.classList.add('cart-shake');
+
+    if (cartWrapper) {
+      cartWrapper.classList.add('active');
+    }
+
+    const sound = new Audio('/sounds/cart.mp3');
+    sound.play().catch(() => {});
+
+    setTimeout(() => {
+      cartIcon.classList.remove('cart-shake');
+    }, 400);
+  }
+
+  // BUY NOW
+buyNowBtn.addEventListener('click', function() {
+  const variant = getVariant();
+
+  if (!variant) {
+    alert("Please select size and color");
+    return;
+  }
+
+  const quantity = parseInt(qtyInput.value);
+
+  // Disable button
+  buyNowBtn.disabled = true;
+  buyNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+  fetch("/buy-now", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      product_id: variant.product_id,
+      variant_id: variant.variant_id,
+      quantity: quantity
+    })
+  })
+  .then(res => {
+    if (res.redirected) {
+      window.location.href = res.url;
+      return null;
+    }
+    return res.json();
+  })
+  .then(data => {
+    if (!data) return;
+
+    if (data.success) {
+      // Go directly to payment
+      window.location.href = `/payout?order=${data.orderId}`;
+    } else {
+      alert(data.message);
+      buyNowBtn.disabled = false;
+      buyNowBtn.innerHTML = 'Buy Now';
+    }
+  })
+  .catch(err => {
+    console.log(err);
+    alert('Error processing purchase');
+    buyNowBtn.disabled = false;
+    buyNowBtn.innerHTML = 'Buy Now';
+  });
+});
+
+
+const cartDrawer  = document.getElementById("cartDrawer");
+const cartOverlay = document.getElementById("cartOverlay");
+const cartIcon    = document.querySelector(".cart-icon");
+
+if (cartIcon) {
+  cartIcon.addEventListener("click", () => {
+    cartDrawer.classList.add("active");
+    cartOverlay.classList.add("active");
+  });
+}
+
+if (cartOverlay) {
+  cartOverlay.addEventListener("click", () => {
+    cartDrawer.classList.remove("active");
+    cartOverlay.classList.remove("active");
+  });
+}
+
+
+const menu     = document.getElementById("sideMenu");
+const overlay  = document.getElementById("overlay");
+const toggle   = document.getElementById("menuToggle");
+
+if (toggle) {
+  toggle.addEventListener("click", () => {
+    menu.classList.toggle("active");
+    overlay.classList.toggle("active");
+    toggle.classList.toggle("fa-bars");
+    toggle.classList.toggle("fa-times");
+  });
+}
+
+if (overlay) {
+  overlay.addEventListener("click", () => {
+    menu.classList.remove("active");
+    overlay.classList.remove("active");
+    toggle.classList.add("fa-bars");
+    toggle.classList.remove("fa-times");
+  });
+}
+
+// dropdowns
+document.querySelectorAll(".dropdown").forEach(d => {
+  const btn = d.querySelector(".drop-btn");
+  if (btn) {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      d.classList.toggle("active");
+    });
+  }
+});
+
+
+</script>
+
+<script src="/js/product.js"></script>
+
+</body>
+</html>

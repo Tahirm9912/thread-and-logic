@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Products</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin-main.css">
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+
+</head>
+<body>
+
+<%- include('../../partials/admin-header') %>
+
+<div class="admin-container">
+  
+  <%- include('../../partials/admin-sidebar') %>
+
+  <main class="admin-main">
+    
+    <div class="page-header">
+      <h1>Products</h1>
+      <a href="/admin/products/add" class="btn-primary">+ Add Product</a>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% products.forEach(product => { %>
+          <tr>
+            <td><%= product.productid %></td>
+            <td>
+              <img  src="<%= product.image_url || '/images/default.jpg' %>" width="50">
+            </td>
+            <td><%= product.name %></td>
+            <td>Rs <%= product.price %></td>
+            <td><%= product.stock %></td>
+            <td>
+              <span class="status <%= product.is_active ? 'active' : 'inactive' %>">
+                <%= product.is_active ? 'Active' : 'Inactive' %>
+              </span>
+            </td>
+<td>
+  <a href="/admin/products/edit/<%= product.productid %>" class="btn-primary btn-sm">
+    <i class="fas fa-edit"></i>
+  </a>
+  <button onclick="deleteProduct(<%= product.productid %>)" class="btn-danger btn-sm">
+    <i class="fas fa-trash"></i>
+  </button>
+</td>
+            
+
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+  </main>
+
+</div>
+
+<script>
+function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+
+  fetch(`/admin/products/${id}`, {
+    method: 'DELETE'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('Product deleted');
+      location.reload();
+    } else {
+      alert('Error deleting product');
+    }
+  });
+}
+</script>
+
+</body>
+</html>

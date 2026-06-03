@@ -1,0 +1,338 @@
+/* ─── ACCOUNT PAGE (CLEAN VELMORA VERSION) ───────── */
+
+.account-section {
+  padding: 120px 20px 60px;
+  background: #fafafa;
+  min-height: 100vh;
+}
+
+.account-container {
+  max-width: 1100px;
+  margin: auto;
+  display: grid;
+  gap: 25px;
+}
+
+/* USER INFO CARD */
+.account-info {
+  background: #fff;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+/* HEADER */
+.account-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.account-name {
+  font-size: 24px;
+  font-weight: 500;
+  color: #222;
+}
+
+/* EDIT BUTTON */
+.edit-btn {
+  padding: 8px 16px;
+  background: #eee;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.3s;
+}
+
+.edit-btn:hover {
+  background: #ddd;
+}
+
+/* INFO GRID */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-item strong {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-item span {
+  font-size: 14px;
+  color: #333;
+}
+
+/* FORM */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--brown);
+  outline: none;
+}
+
+/* FORM ACTIONS */
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.save-btn {
+  padding: 10px 18px;
+  background: var(--brown);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.3s;
+}
+
+.save-btn:hover {
+  background: var(--brown-dark);
+}
+
+.cancel-btn {
+  padding: 10px 18px;
+  background: #eee;
+  color: #333;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.cancel-btn:hover {
+  background: #ddd;
+}
+
+/* ORDER HISTORY */
+.order-history {
+  background: #fff;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+.order-history h3 {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+/* ORDER CARD */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-card {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.order-card:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* HEADER */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: #f9f9f9;
+}
+
+.order-header h4 {
+  font-size: 15px;
+  color: #222;
+}
+
+.order-date {
+  font-size: 12px;
+  color: #888;
+}
+
+/* STATUS BADGE */
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* STATUS COLORS (VELMORA STYLE) */
+.status-badge.pending {
+  background: #f5e6d8;
+  color: var(--brown);
+}
+
+.status-badge.processing,
+.status-badge.placed {
+  background: #ede7e2;
+  color: var(--brown);
+}
+
+.status-badge.shipped {
+  background: #e3edf5;
+  color: #2c5d86;
+}
+
+.status-badge.delivered {
+  background: #e6f4ea;
+  color: #2e7d32;
+}
+
+.status-badge.cancelled {
+  background: #fdecea;
+  color: #c62828;
+}
+
+/* ITEMS */
+.order-items {
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.order-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.order-item img {
+  width: 60px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.item-info h5 {
+  font-size: 14px;
+  color: #222;
+}
+
+.item-info p {
+  font-size: 12px;
+  color: #666;
+}
+
+/* FOOTER */
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #fafafa;
+  border-top: 1px solid #eee;
+}
+
+.order-total span {
+  color: var(--brown);
+  font-weight: 600;
+}
+
+.order-payment span {
+  color: #444;
+  font-size: 13px;
+}
+
+/* VIEW BUTTON */
+.btn-view-order {
+  padding: 7px 14px;
+  background: var(--brown);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 12px;
+  transition: 0.3s;
+}
+
+.btn-view-order:hover {
+  background: var(--brown-dark);
+}
+
+/* NO ORDERS */
+.no-orders {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-orders i {
+  font-size: 40px;
+  color: #ddd;
+  margin-bottom: 10px;
+}
+
+.no-orders p {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.shop-btn {
+  padding: 10px 20px;
+  background: var(--brown);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.shop-btn:hover {
+  background: var(--brown-dark);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .order-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}

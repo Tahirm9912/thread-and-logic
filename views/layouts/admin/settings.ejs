@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Settings</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin-main.css">
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+
+
+</head>
+<body>
+
+<%- include('../../partials/admin-header') %>
+
+<div class="admin-container">
+  
+  <%- include('../../partials/admin-sidebar') %>
+
+  <main class="admin-main">
+    
+    <h1>Site Settings</h1>
+
+    <% 
+    const carousel_1 = settings.find(s => s.setting_key === 'carousel_1')?.setting_value || '';
+    const carousel_2 = settings.find(s => s.setting_key === 'carousel_2')?.setting_value || '';
+    const carousel_3 = settings.find(s => s.setting_key === 'carousel_3')?.setting_value || '';
+    const carousel_4 = settings.find(s => s.setting_key === 'carousel_4')?.setting_value || '';
+    const carousel_5 = settings.find(s => s.setting_key === 'carousel_5')?.setting_value || '';
+    const popup_image = settings.find(s => s.setting_key === 'popup_image')?.setting_value || '';
+    const popup_enabled = settings.find(s => s.setting_key === 'popup_enabled')?.setting_value === 'true';
+    %>
+
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="alert alert-success">Settings saved successfully!</div>
+    <% } %>
+
+    <form action="/admin/settings/update" method="POST" class="settings-form">
+
+      <section class="settings-section">
+        <h2>Carousel Images</h2>
+        <p class="help-text">Enter image URLs (upload images to /public/images/)</p>
+
+        <div class="form-group">
+          <label>Carousel Image 1</label>
+          <input type="text" name="carousel_1" value="<%= carousel_1 %>" placeholder="/images/slide1.jpg">
+        </div>
+
+        <div class="form-group">
+          <label>Carousel Image 2</label>
+          <input type="text" name="carousel_2" value="<%= carousel_2 %>" placeholder="/images/slide2.jpg">
+        </div>
+
+        <div class="form-group">
+          <label>Carousel Image 3</label>
+          <input type="text" name="carousel_3" value="<%= carousel_3 %>" placeholder="/images/slide3.jpg">
+        </div>
+
+        <div class="form-group">
+          <label>Carousel Image 4</label>
+          <input type="text" name="carousel_4" value="<%= carousel_4 %>" placeholder="/images/slide4.jpg">
+        </div>
+
+        <div class="form-group">
+          <label>Carousel Image 5</label>
+          <input type="text" name="carousel_5" value="<%= carousel_5 %>" placeholder="/images/slide5.jpg">
+        </div>
+      </section>
+
+ <section class="settings-section">
+  <h2>Popup Settings</h2>
+
+  <div class="form-group">
+    <label>Popup Image</label>
+    <input type="text" name="popup_image" value="<%= popup_image %>" placeholder="/images/popup.jpg">
+  </div>
+
+  <div class="form-check">
+    <!-- Hidden field ensures a value is always sent -->
+    <input type="hidden" name="popup_enabled" value="false">
+    <label class="checkbox-label">
+      <input type="checkbox" name="popup_enabled" value="true" <%= popup_enabled ? 'checked' : '' %>>
+      <span>Enable Popup</span>
+    </label>
+  </div>
+</section>
+
+      <button type="submit" class="btn-primary">Save Changes</button>
+
+    </form>
+
+  </main>
+
+</div>
+
+<style>
+.settings-form {
+  max-width: 800px;
+}
+
+.settings-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.settings-section h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.help-text {
+  color: #666;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-check {
+  margin-bottom: 1rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+</style>
+
+</body>
+</html>

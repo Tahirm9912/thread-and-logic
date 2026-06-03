@@ -1,0 +1,35 @@
+{
+  "name": "velmora-ecommerce",
+  "version": "1.0.0",
+  "description": "E-commerce platform for Pakistani fashion",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "fashion",
+    "nodejs",
+    "express"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "ejs": "^5.0.2",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^8.0.7",
+    "pg": "^8.20.0",
+    "resend": "^6.12.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

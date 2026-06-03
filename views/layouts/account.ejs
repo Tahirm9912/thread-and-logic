@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+  <title>My Account - aynByHadiyaz</title>
+  <link rel="stylesheet" href="/css/account.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+  <%- include('../partials/loading') %>
+
+
+<%- include('../partials/header-ns') %>
+<%- include('../partials/breadcrumb') %>
+
+<section class="account-section">
+
+  <div class="account-container">
+
+    <!-- USER INFO -->
+    <div class="account-info">
+
+      <div class="account-header">
+        <h2 class="account-name"><%= user.name %></h2>
+        <button onclick="toggleEdit()" class="edit-btn" id="editToggleBtn">
+          <i class="fas fa-edit"></i> Edit Info
+        </button>
+      </div>
+
+      <!-- VIEW MODE -->
+      <div id="viewMode" class="info-grid">
+        <div class="info-item">
+          <strong>Email:</strong>
+          <span><%= user.email %></span>
+        </div>
+
+        <div class="info-item">
+          <strong>Phone:</strong>
+          <span><%= user.tel || 'Not provided' %></span>
+        </div>
+
+        <div class="info-item">
+          <strong>Address:</strong>
+          <span><%= user.address || 'Not provided' %></span>
+        </div>
+
+        <div class="info-item">
+          <strong>Postal Code:</strong>
+          <span><%= user.postal_code || 'Not provided' %></span>
+        </div>
+
+        <div class="info-item">
+          <strong>Member Since:</strong>
+          <span><%= new Date(user.created_at).toLocaleDateString() %></span>
+        </div>
+      </div>
+
+      <!-- EDIT MODE -->
+      <form id="editForm" class="info-grid" style="display:none;" onsubmit="updateProfile(event)">
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" value="<%= user.email %>" required>
+        </div>
+
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" name="tel" value="<%= user.tel || '' %>" placeholder="03XXXXXXXXX">
+        </div>
+
+        <div class="form-group">
+          <label>Address</label>
+          <textarea name="address" rows="3" placeholder="Your complete address"><%= user.address || '' %></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Postal Code</label>
+          <input type="text" name="postal_code" value="<%= user.postal_code || '' %>" placeholder="49500">
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="save-btn">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+          <button type="button" onclick="cancelEdit()" class="cancel-btn">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+    <!-- ORDER HISTORY -->
+    <div class="order-history">
+
+      <h3>Order History</h3>
+
+      <% if (orders && orders.length > 0) { %>
+
+        <div class="orders-list">
+
+          <% orders.forEach(order => { %>
+
+            <div class="order-card">
+              
+              <div class="order-header">
+                <div>
+                  <h4>Order #<%= order.id %></h4>
+                  <p class="order-date"><%= new Date(order.created_at).toLocaleDateString() %></p>
+                </div>
+                <div>
+                  <span class="status-badge <%= order.status %>">
+                    <%= order.status.replace(/_/g, ' ').toUpperCase() %>
+                  </span>
+                </div>
+              </div>
+
+              <div class="order-items">
+                <% if (order.items && order.items.length > 0) { %>
+                  <% order.items.forEach(item => { %>
+                    <div class="order-item">
+                      <img src="<%= item.image_url || '/images/default.jpg' %>" alt="<%= item.name %>">
+                      <div class="item-info">
+                        <h5><%= item.name %></h5>
+                        <p>Qty: <%= item.quantity %> × Rs <%= parseFloat(item.price).toFixed(0) %></p>
+                      </div>
+                    </div>
+                  <% }) %>
+                <% } %>
+              </div>
+
+<div class="order-footer">
+  <div class="order-total">
+    <strong>Total:</strong>
+    <span>Rs <%= parseFloat(order.total_amount).toFixed(0) %></span>
+  </div>
+  <div class="order-payment">
+    <strong>Payment:</strong>
+    <span><%= order.payment_method || 'N/A' %></span>
+  </div>
+  <a href="/order/<%= order.id %>" class="btn-view-order">View Details</a>
+</div>
+
+            </div>
+
+          <% }) %>
+
+        </div>
+
+      <% } else { %>
+
+        <div class="no-orders">
+          <i class="fas fa-shopping-bag"></i>
+          <p>No orders yet</p>
+          <a href="/list" class="shop-btn">Start Shopping</a>
+        </div>
+
+      <% } %>
+
+    </div>
+
+  </div>
+
+</section>
+
+<%- include('../partials/menubar') %>
+<%- include('../partials/cart') %>
+<%- include('../partials/footer') %>
+
+<script src="/js/account.js"></script>
+
+</body>
+</html>

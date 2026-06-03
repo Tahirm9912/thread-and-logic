@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Users</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin-main.css">
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+
+
+</head>
+<body>
+
+<%- include('../../partials/admin-header') %>
+
+<div class="admin-container">
+  
+  <%- include('../../partials/admin-sidebar') %>
+
+  <main class="admin-main">
+    
+    <h1>Users</h1>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Joined</th>
+          <th>Verification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(user => { %>
+          <tr>
+            <td><%= user.userid %></td>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td><%= user.tel || 'N/A' %></td>
+            <td><%= new Date(user.created_at).toLocaleDateString() %></td>
+            <td>
+              <span class="badge">
+                <%= user.email_verified ? 'Verified' : 'Not Verified' %>
+              </span>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+  </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin-main.css">
+</head>
+<body>
+
+<%- include('../../partials/admin-header') %>
+
+<div class="admin-container">
+  
+  <%- include('../../partials/admin-sidebar') %>
+
+  <main class="admin-main">
+    
+    <h1>Dashboard</h1>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      
+      <div class="stat-card">
+        <i class="fas fa-box"></i>
+        <div>
+          <h3><%= stats.total_products %></h3>
+          <p>Products</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <i class="fas fa-users"></i>
+        <div>
+          <h3><%= stats.total_users %></h3>
+          <p>Users</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <i class="fas fa-shopping-cart"></i>
+        <div>
+          <h3><%= stats.total_orders %></h3>
+          <p>Orders</p>
+        </div>
+      </div>
+
+
+
+    </div>
+
+    <!-- RECENT ORDERS -->
+    <section class="recent-orders">
+      <h2>Recent Orders</h2>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% recentOrders.forEach(order => { %>
+            <tr>
+              <td>#<%= order.id %></td>
+              <td>
+                <%= order.user_name %><br>
+                <small><%= order.user_email %></small>
+              </td>
+              <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+              <td>Rs <%= order.total_amount %></td>
+              <td><%= order.payment_method || 'N/A' %></td>
+              <td><span class="status <%= order.status %>"><%= order.status %></span></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+
+    </section>
+
+  </main>
+
+</div>
+
+</body>
+</html>

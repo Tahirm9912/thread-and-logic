@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - aynByHadiyaz</title>
+  <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/list.css">
+    <link rel="stylesheet" href="/css/main.css">
+
+</head>
+
+<body>
+
+<%- include("../partials/header") %>
+<%- include("../partials/breadcrumb") %>
+
+
+<section class="listing reveal">
+
+  <div class="listing-top">
+
+  <h2 class="listing-heading">
+    <% if (searchQuery) { %>
+      Search Results for "<%= searchQuery %>"
+    <% } else if (activeTag) { %>
+      <%= activeTag %>
+    <% } else { %>
+      All Products
+    <% } %>
+  </h2>
+
+    <div class="listing-controls">
+
+      <button class="filter-btn" id="filterBtn">
+        <i class="fas fa-sliders-h"></i> Filter
+      </button>
+
+      <select class="sort-select" onchange="sortProducts(this.value)">
+        <option value="default">Sort By</option>
+        <option value="low">Price: Low to High</option>
+        <option value="high">Price: High to Low</option>
+        <option value="new">Newest First</option>
+      </select>
+
+    </div>
+  </div>
+
+  <div class="listing-grid">
+
+    <% if (products && products.length > 0) { %>
+
+      <% products.forEach(product => { %>
+        
+        <div class="listing-card">
+            <button class="wishlist-btn" onclick="toggleWishlist(event, <%= product.productid %>)">
+    <i class="far fa-heart"></i>
+  </button>
+          <a href="/product/<%= product.productid %>" class="card-link">
+           <img 
+  src="<%= product.image_url || '/images/default.jpg' %>" 
+  alt="<%= product.alt_text || product.name %>"
+>
+    
+            <div class="listing-info">
+              <h3><%= product.name %></h3>
+              <p class="price">Rs <%= parseFloat(product.price).toFixed(0) %></p>
+            </div>
+
+            <% if (product.tags && product.tags.length > 0) { %>
+              <div class="product-tags">
+                <% product.tags.forEach(tag => { %>
+                  <a href="/list?tag=<%= tag %>" class="tag" onclick="event.stopPropagation()">
+                    <%= tag %>
+                  </a>
+                <% }) %>
+              </div>
+            <% } %>
+          </a>
+    
+          <div class="listing-actions">
+            <button onclick="addToCart(<%= product.productid %>, <%= product.variant_id %>)" class="btn-cart">
+              Add to Cart
+            </button>
+            <button onclick="buyNow(<%= product.productid %>, <%= product.variant_id %>)" class="btn-buy">
+              Buy Now
+            </button>
+          </div>
+    
+        </div>
+
+      <% }) %>
+
+<% } else { %>
+  <div class="no-products">
+    <i class="fas fa-box-open"></i>
+    <p>No products found</p>
+    <% if (searchQuery) { %>
+      <p>Try different keywords or <a href="/list">view all products</a></p>
+    <% } else { %>
+      <a href="/list" class="reset-link">View All Products</a>
+    <% } %>
+  </div>
+<% } %>
+
+  </div>
+
+</section>
+
+<!-- FILTER DRAWER -->
+<div class="filter-overlay" id="filterOverlay"></div>
+
+<aside class="filter-drawer" id="filterDrawer">
+
+  <h3>Filters</h3>
+
+  <div class="filter-group">
+    <h4>Category</h4>
+    <label>
+      <input type="checkbox" value="new" data-category="tag"> 
+      New Arrivals
+    </label>
+    <label>
+      <input type="checkbox" value="summer" data-category="tag"> 
+      Summer
+    </label>
+    <label>
+      <input type="checkbox" value="winter" data-category="tag"> 
+      Winter
+    </label>
+    <label>
+      <input type="checkbox" value="formal" data-category="tag"> 
+      Formal
+    </label>
+    <label>
+      <input type="checkbox" value="casual" data-category="tag"> 
+      Casual
+    </label>
+  </div>
+
+  <div class="filter-group">
+    <h4>Fabric</h4>
+    <label>
+      <input type="checkbox" value="lawn" data-category="tag"> 
+      Lawn
+    </label>
+    <label>
+      <input type="checkbox" value="cotton" data-category="tag"> 
+      Cotton
+    </label>
+    <label>
+      <input type="checkbox" value="chiffon" data-category="tag"> 
+      Chiffon
+    </label>
+  </div>
+
+  <div class="filter-actions">
+    <button class="reset-btn">Reset</button>
+    <button class="apply-btn">Apply</button>
+  </div>
+
+</aside>
+
+<%- include("../partials/menubar") %>
+<%- include("../partials/cart") %>
+<%- include("../partials/search") %>
+<%- include("../partials/footer") %>
+
+<script src="/js/list.js"></script>
+
+<script>
+function sortProducts(sortBy) {
+  const url = new URL(window.location.href);
+  
+  if (sortBy === 'default') {
+    url.searchParams.delete('sort');
+  } else {
+    url.searchParams.set('sort', sortBy);
+  }
+  
+  window.location.href = url.toString();
+}
+</script>
+
+</body>
+</html>

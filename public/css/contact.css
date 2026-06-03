@@ -1,0 +1,139 @@
+/* ─── CONTACT PAGE ───────────────────────── */
+
+.contact-section {
+  padding: 120px 20px 60px;
+  text-align: center;
+  background: #fafafa;
+}
+
+.contact-title {
+  font-size: 32px;
+  font-weight: 500;
+  margin-bottom: 40px;
+  color: #2c2c2c;
+}
+
+/* GRID */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* CARD */
+.contact-card {
+  background: white;
+  padding: 25px 15px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  transition: 0.3s ease;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-card i {
+  font-size: 24px;
+  color: var(--brown);
+  margin-bottom: 10px;
+}
+
+.contact-card h3 {
+  font-size: 16px;
+  margin-bottom: 5px;
+  color: #333;
+  font-weight: 500;
+}
+
+.contact-card p {
+  font-size: 13px;
+  color: #666;
+}
+
+/* HOVER */
+.contact-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+/* ─── MESSAGE FORM ───────────────────────── */
+
+.message-section {
+  padding: 60px 20px;
+  text-align: center;
+  background: #fff;
+}
+
+.message-section h2 {
+  font-size: 26px;
+  margin-bottom: 25px;
+  color: #2c2c2c;
+}
+
+.contact-form {
+  max-width: 600px;
+  margin: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.contact-form input,
+.contact-form textarea {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: "Jost", sans-serif;
+  outline: none;
+  transition: 0.3s;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: var(--brown);
+}
+
+/* BUTTON */
+.contact-form button {
+  padding: 12px;
+  background: var(--brown);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.contact-form button:hover {
+  background: var(--brown-dark);
+}
+
+/* ─── MAP ───────────────────────── */
+
+.map-section {
+  margin-top: 40px;
+}
+
+/* ─── RESPONSIVE ───────────────────────── */
+
+@media (max-width: 1024px) {
+  .contact-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
