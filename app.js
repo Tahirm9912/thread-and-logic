@@ -10,6 +10,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import { logTraffic } from "./middleware/logTraffic.js";
+import sitemapRoutes from "./routes/sitemapRoutes.js"
 
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { attachCart } from "./middleware/cartData.js";
@@ -53,6 +54,10 @@ app.use("/cart", cartRoutes);
 app.use("/order", orderRoutes);
 
 app.use("/", pageRoutes);
+
+app.use("/", sitemapRoutes)
+
+
 
 
 app.use((req, res) => {
