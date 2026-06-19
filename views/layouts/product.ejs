@@ -116,7 +116,9 @@
         <a href="/product/<%= product.productid %>">
           <img src="<%= product.image_url || '/images/default.jpg' %>" alt="<%= product.name %>">
           <h3><%= product.name %></h3>
-          <p class="price">Rs <%= parseFloat(product.price).toFixed(0) %></p>
+<p class="price">
+  Rs <%= parseFloat(product.price).toLocaleString('en-PK', { maximumFractionDigits: 0 }) %>
+</p>
         </a>
       </div>
     <% }) %>
@@ -150,7 +152,7 @@ function updateVariant() {
   // const stockStatus = document.getElementById('stockStatus');
 
   if (variant) {
-    priceEl.innerText = "Rs " + parseFloat(variant.price).toFixed(0);
+    priceEl.innerText = "Rs " + parseFloat(variant.price).toLocaleString('en-PK', {maximumFractionDigits:0});
     
     // Show stock status
     if (variant.stock > 10) {
