@@ -208,3 +208,6 @@ function trackRecentlyViewed(productId) {
 // Call when page loads
 const productId = <%= product.productid %>;
 trackRecentlyViewed(productId);
+
+
+

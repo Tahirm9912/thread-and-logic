@@ -73,9 +73,9 @@
                   </div>
                 </td>
 
-                <td>Rs <%= parseFloat(item.price).toFixed(0) %></td>
+<td>Rs <%= Number(parseFloat(item.price)).toLocaleString('en-PK', { maximumFractionDigits: 0 }) %></td>
 
-                <td>Rs <%= (parseFloat(item.price) * item.quantity).toFixed(0) %></td>
+<td>Rs <%= Number(parseFloat(item.price) * item.quantity).toLocaleString('en-PK', { maximumFractionDigits: 0 }) %></td>
 
                 <td>
                   <button class="remove-btn" onclick="removeItem(<%= item.id %>)">
@@ -96,22 +96,26 @@
       <!-- TOTALS -->
       <div class="checkout-summary">
 
-        <div class="summary-row">
-          <span>Subtotal:</span>
-          <span id="subtotal">Rs <%= parseFloat(total).toFixed(0) %></span>
-        </div>
+<div class="summary-row">
+  <span>Subtotal:</span>
+  <span id="subtotal">
+    Rs <%= Number(parseFloat(total)).toLocaleString('en-PK', { maximumFractionDigits: 0 }) %>
+  </span>
+</div>
 
-        <div class="summary-row">
-          <span>Delivery Charges:</span>
-          <span>Rs 200</span>
-        </div>
+<div class="summary-row">
+  <span>Delivery Charges:</span>
+  <span>Rs 300</span>
+</div>
 
-        <hr>
+<hr>
 
-        <div class="summary-row total">
-          <span>Total:</span>
-          <span id="grandTotal">Rs <%= (parseFloat(total) + 200).toFixed(0) %></span>
-        </div>
+<div class="summary-row total">
+  <span>Total:</span>
+  <span id="grandTotal">
+    Rs <%= Number(parseFloat(total) + 300).toLocaleString('en-PK', { maximumFractionDigits: 0 }) %>
+  </span>
+</div>
 
         <button onclick="goToPayout()" class="checkout-btn">
           Proceed to Payment
@@ -136,6 +140,8 @@
 <%- include('../partials/menubar') %>
 <%- include('../partials/cart') %>
 <%- include('../partials/footer') %>
+<%- include("../partials/whatsapp")%>
+
 
 <script src="/js/checkout.js"></script>
 

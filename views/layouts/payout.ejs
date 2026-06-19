@@ -31,15 +31,15 @@
         Cash on Delivery
       </label>
 
-      <label class="pay-option">
+      <!-- <label class="pay-option">
         <input type="radio" name="pay" value="easypaisa">
-        Easypaisa
+        Easypaisa (Under Maintenance)
       </label>
 
       <div id="qrBox" style="display:none; margin-top:20px;">
         <p>Scan QR & pay via Easypaisa</p>
         <img src="/images/qrCode.jpg" width="200" alt="QR Code">
-      </div>
+      </div> -->
 
     </div>
 
@@ -48,22 +48,26 @@
 
       <h3>Order Summary</h3>
 
-      <div class="summary-item">
-        <span>Subtotal</span>
-        <span>Rs <%= order ? parseFloat(order.total_amount).toFixed(0) : 0 %></span>
-      </div>
+ <div class="summary-item">
+  <span>Subtotal</span>
+  <span>
+    Rs <%= order ? Number(parseFloat(order.total_amount)).toLocaleString('en-PK', { maximumFractionDigits: 0 }) : 0 %>
+  </span>
+</div>
 
-      <div class="summary-item">
-        <span>Delivery</span>
-        <span>Rs 200</span>
-      </div>
+<div class="summary-item">
+  <span>Delivery</span>
+  <span>Rs 200</span>
+</div>
 
-      <hr>
+<hr>
 
-      <div class="summary-total">
-        <span>Total</span>
-        <span>Rs <%= order ? (parseFloat(order.total_amount) + 200).toFixed(0) : 200 %></span>
-      </div>
+<div class="summary-total">
+  <span>Total</span>
+  <span>
+    Rs <%= order ? Number(parseFloat(order.total_amount) + 200).toLocaleString('en-PK', { maximumFractionDigits: 0 }) : 200 %>
+  </span>
+</div>
 
       <button onclick="confirmOrder(<%= order ? order.id : 0 %>)" class="pay-btn">
         Confirm Order
@@ -78,6 +82,7 @@
 <%- include('../partials/menubar') %>
 <%- include('../partials/cart') %>
 <%- include('../partials/footer') %>
+<%- include("../partials/whatsapp")%>
 
 <script src="/js/payout.js"></script>
 

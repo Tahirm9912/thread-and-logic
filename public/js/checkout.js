@@ -149,3 +149,88 @@ function goToPayout() {
 window.updateQty = updateQty;
 window.removeItem = removeItem;
 window.goToPayout = goToPayout;
+
+
+
+
+// ─── WHATSAPP CHAT FUNCTIONALITY ─────────────────────────
+
+const whatsappToggle = document.getElementById('whatsappToggle');
+const whatsappDrawer = document.getElementById('whatsappDrawer');
+const whatsappOverlay = document.getElementById('whatsappOverlay');
+const whatsappClose = document.getElementById('whatsappClose');
+const whatsappSend = document.getElementById('whatsappSend');
+const whatsappMessage = document.getElementById('whatsappMessage');
+
+// YOUR WHATSAPP NUMBER
+const WHATSAPP_NUMBER = '923166389642';
+
+// ─── TOGGLE FUNCTION ─────────────────────────
+function toggleWhatsapp() {
+  if (whatsappDrawer.classList.contains('active')) {
+    // Close
+    whatsappDrawer.classList.remove('active');
+    whatsappOverlay.classList.remove('active');
+  } else {
+    // Open
+    whatsappDrawer.classList.add('active');
+    whatsappOverlay.classList.add('active');
+    whatsappMessage.focus();
+  }
+}
+
+// Toggle on whatsapp icon click
+if (whatsappToggle) {
+  whatsappToggle.addEventListener('click', toggleWhatsapp);
+}
+
+// Close buttons
+if (whatsappClose) {
+  whatsappClose.addEventListener('click', toggleWhatsapp);
+}
+
+if (whatsappOverlay) {
+  whatsappOverlay.addEventListener('click', toggleWhatsapp);
+}
+
+// ─── SEND TO WHATSAPP ─────────────────────────
+if (whatsappSend) {
+  whatsappSend.addEventListener('click', () => {
+    const message = whatsappMessage.value.trim();
+    
+    if (!message) {
+      alert('Please enter a message');
+      whatsappMessage.focus();
+      return;
+    }
+    
+    // Get current page URL and title
+    const currentPageUrl = window.location.href;
+    const currentPageTitle = document.title;
+    
+    // Format the message
+    const formattedMessage = 
+      `Message: ${message}%0a%0a` +
+      `URL: ${currentPageUrl}`;
+    
+    // Create WhatsApp URL
+    const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${formattedMessage}`;
+    
+    // Disable button during redirect
+    whatsappSend.disabled = true;
+    whatsappSend.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening...';
+    
+    // Redirect to WhatsApp
+    setTimeout(() => {
+      window.open(whatsappURL, '_blank');
+      
+      // Reset button
+      whatsappSend.disabled = false;
+      whatsappSend.innerHTML = '<i class="fas fa-paper-plane"></i> Send to WhatsApp';
+      
+      // Close drawer and clear message
+      toggleWhatsapp();
+      whatsappMessage.value = '';
+    }, 1000);
+  });
+}

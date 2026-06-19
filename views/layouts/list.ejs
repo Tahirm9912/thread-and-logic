@@ -66,7 +66,7 @@
     
             <div class="listing-info">
               <h3><%= product.name %></h3>
-              <p class="price">Rs <%= parseFloat(product.price).toFixed(0) %></p>
+              <p class="price">Rs <%= parseFloat(product.price).toLocaleString('en-PK', {maximumFractionDigits: 0}) %></p>
             </div>
 
             <% if (product.tags && product.tags.length > 0) { %>
@@ -167,6 +167,7 @@
 <%- include("../partials/cart") %>
 <%- include("../partials/search") %>
 <%- include("../partials/footer") %>
+<%- include("../partials/whatsapp")%>
 
 <script src="/js/list.js"></script>
 

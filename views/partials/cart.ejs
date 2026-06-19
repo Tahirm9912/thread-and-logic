@@ -20,7 +20,7 @@
           <div class="cart-item-info">
             <h4><%= item.name %></h4>
             <p><%= item.size %> • <%= item.color %></p>
-            <p class="cart-price">Rs <%= item.price %></p>
+<p class="cart-price">Rs <%= Number(item.price).toLocaleString('en-PK', { maximumFractionDigits: 0 }) %></p>
           </div>
 
           <div class="cart-qty">

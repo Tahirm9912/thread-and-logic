@@ -20,17 +20,17 @@
   <div class="slider">
     <a href="/list">
       <div class="slides">
-        <% 
+        <%
         // FIXED: Get carousel images from settings object
         const carousel1 = settings['carousel_1'] || '';
         const carousel2 = settings['carousel_2'] || '';
         const carousel3 = settings['carousel_3'] || '';
         const carousel4 = settings['carousel_4'] || '';
         const carousel5 = settings['carousel_5'] || '';
-        
+
         const carousel_images = [carousel1, carousel2, carousel3, carousel4, carousel5].filter(img => img && img.trim() !== '');
         %>
-        
+
         <% if (carousel_images.length > 0) { %>
           <% carousel_images.forEach((img, index) => { %>
             <img loading="lazy" src="<%= img %>" class="slide <%= index === 0 ? 'active' : '' %>" alt="Slide <%= index + 1 %>">
@@ -51,7 +51,7 @@
 <!-- CATEGORIES - USE SLUG AS TAG -->
 <section class="categories reveal">
   <h2 class="cat-heading">Shop by Categories</h2>
-  
+
   <% if (categories && categories.length > 0) { %>
     <div class="cat-grid">
       <% categories.forEach(cat => { %>
@@ -85,7 +85,8 @@
               <a href="/product/<%= product.productid %>" class="trend-link"><%= product.name %></a>
             </h3>
 
-            <p class="price">Rs <%= parseFloat(product.price).toFixed(0) %></p>
+<p class="price">Rs <%= parseFloat(product.price).toLocaleString('en-PK', { maximumFractionDigits: 0 }) %></p>
+
 
             <div class="trend-actions">
               <button onclick="quickAddToCart(<%= product.productid %>, <%= product.variant_id %>)" class="btn-cart">
@@ -106,9 +107,11 @@
 <%- include('../partials/cart') %>
 <%- include('../partials/search') %>
 <%- include('../partials/footer') %>
+<%- include("../partials/whatsapp")%>
+
 
 <!-- POPUP MODAL -->
-<% 
+<%
 const popupEnabled = settings['popup_enabled'] === 'true';
 const popupImage = settings['popup_image'] || '';
 %>
@@ -128,7 +131,7 @@ window.addEventListener('load', function() {
   const popup = document.getElementById('popup');
   const popupClose = document.getElementById('popupClose');
   const hasSeenPopup = sessionStorage.getItem('hasSeenPopup');
-  
+
   if (!hasSeenPopup && popup) {
     setTimeout(() => {
       popup.style.display = 'flex';
@@ -188,23 +191,23 @@ function quickAddToCart(productId, variantId) {
   })
   .then(data => {
     if (!data) return;
-    
+
     if (data.success) {
       // 1. Play sound and animation
       if (typeof addToCartAnimation === 'function') {
         addToCartAnimation();
       }
-      
+
       // 2. Update cart count badge
       if (typeof updateCartCount === 'function') {
         updateCartCount();
       }
-      
+
       // 3. Update cart drawer content
       if (typeof updateCartDrawer === 'function') {
         updateCartDrawer();
       }
-      
+
       // 4. Show success notification
       if (typeof showNotification === 'function') {
         showNotification('Added to cart!');

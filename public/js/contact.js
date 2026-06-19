@@ -95,3 +95,4 @@ document.querySelectorAll(".cart-item").forEach(item => {
     });
   }
 });
+

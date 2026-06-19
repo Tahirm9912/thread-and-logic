@@ -1,0 +1,47 @@
+<!-- WHATSAPP TOGGLE BUTTON -->
+<div class="whatsapp-toggle-wrapper">
+  <a href="javascript:void(0)" id="whatsappToggle" class="whatsapp-toggle" title="Chat on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+</div>
+
+<!-- OVERLAY -->
+<div id="whatsappOverlay" class="whatsapp-overlay"></div>
+
+<!-- WHATSAPP CHAT DIV (hidden initially) -->
+<div id="whatsappDrawer" class="whatsapp-drawer">
+  <div class="whatsapp-header">
+    <h3>
+      <i class="fab fa-whatsapp"></i> Chat with Us
+    </h3>
+    <button id="whatsappClose" class="whatsapp-close">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  
+  <div class="whatsapp-body">
+    <div class="whatsapp-intro">
+      <p>Have a question about this product? Send us a message!</p>
+    </div>
+    
+    <div class="whatsapp-form">
+      <label for="whatsappMessage">Your Message</label>
+      <textarea 
+        id="whatsappMessage" 
+        placeholder="Type your message here..." 
+        rows="5"
+      ></textarea>
+      
+      <button id="whatsappSend" class="whatsapp-send-btn">
+        <i class="fas fa-paper-plane"></i> Send to WhatsApp
+      </button>
+    </div>
+  </div>
+  
+  <div class="whatsapp-footer">
+    <p class="whatsapp-note">
+      <i class="fas fa-info-circle"></i> 
+      We'll share your message with the current page link
+    </p>
+  </div>
+</div>
