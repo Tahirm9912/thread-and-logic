@@ -70,7 +70,7 @@
             </div>
 
             <% if (product.tags && product.tags.length > 0) { %>
-              <div class="product-tags">
+              <div class="product-tags" style="display: none;">
                 <% product.tags.forEach(tag => { %>
                   <a href="/list?tag=<%= tag %>" class="tag" onclick="event.stopPropagation()">
                     <%= tag %>

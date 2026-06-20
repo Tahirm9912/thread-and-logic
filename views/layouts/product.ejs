@@ -11,12 +11,16 @@
   <meta name="<%= product.name %>" content="<%= product.description %>" />
 </head>
 
+
 <body>
+
 
 <%- include('../partials/header-ns') %>
 <%- include("../partials/breadcrumb") %>
 
+
 <section class="product-page">
+
 
   <!-- LEFT SIDE - IMAGES -->
   <div class="product-images">
@@ -29,6 +33,7 @@
         <img id="mainImg" src="/images/default.jpg" alt="<%= product.name %>">
       <% } %>
     </div>
+
 
     <!-- THUMBNAIL IMAGES -->
     <% if (images && images.length > 0) { %>
@@ -43,20 +48,27 @@
       </div>
     <% } %>
 
+
   </div>
+
 
   <!-- RIGHT SIDE - INFO -->
   <div class="product-info">
     <!-- rest of product info ... -->
 
+
     <h1><%= product.name %></h1>
+
 
 <p id="price">Select options</p>
 
+
 <!-- STOCK STATUS -->
-<p id="stockStatus" class="stock-status"></p>
+<!-- <p id="stockStatus" class="stock-status"></p> -->
+
 
 <p><%= product.description %></p>
+
 
     <% if (product.tags && product.tags.length > 0) { %>
       <div class="product-tags">
@@ -68,7 +80,9 @@
       </div>
     <% } %>
 
+
     <div class="product-options">
+
 
       <!-- SIZE -->
       <label>Size</label>
@@ -78,6 +92,7 @@
         <% }) %>
       </select>
 
+
       <!-- COLOR -->
       <label>Color</label>
       <select id="colorSelect">
@@ -85,6 +100,7 @@
           <option value="<%= color %>"><%= color %></option>
         <% }) %>
       </select>
+
 
       <!-- QUANTITY -->
       <label>Quantity</label>
@@ -94,16 +110,29 @@
         <button type="button" onclick="changeQty(1)">+</button>
       </div>
 
+
     </div>
+
 
     <div class="product-actions">
       <button id="addToCartBtn" class="btn-cart">Add to Cart</button>
       <button id="buyNowBtn" class="btn-buy">Buy Now</button>
     </div>
 
+
+    <!-- WHATSAPP ORDER BUTTON -->
+    <a href="javascript:void(0)" 
+       class="btn-whatsapp" 
+       id="whatsappOrderBtn">
+      <i class="fab fa-whatsapp"></i> Order through WhatsApp
+    </a>
+
+
   </div>
 
+
 </section>
+
 
 <!-- RELATED PRODUCTS -->
 <% if (relatedProducts && relatedProducts.length > 0) { %>
@@ -126,14 +155,20 @@
 </section>
 <% } %>
 
+
 <%- include('../partials/menubar') %>
 <%- include('../partials/cart') %>
 <%- include('../partials/search') %>
 <%- include('../partials/footer') %>
 <%- include("../partials/whatsapp")%>
 
+
 <script>
+  // ===============================
+  // 🟢 PRODUCT PAGE VARIANTS & FUNCTIONS
+  // ===============================
   const variants = <%- JSON.stringify(variants) %>;
+
 
   const sizeSelect = document.getElementById("sizeSelect");
   const colorSelect = document.getElementById("colorSelect");
@@ -141,37 +176,45 @@
   const qtyInput = document.getElementById("qty");
   const addToCartBtn = document.getElementById("addToCartBtn");
   const buyNowBtn = document.getElementById("buyNowBtn");
+  const stockStatus = document.getElementById('stockStatus');
+
 
   // UPDATE PRICE
-function updateVariant() {
-  const variant = variants.find(v =>
-    v.size === sizeSelect.value &&
-    v.color === colorSelect.value
-  );
+  function updateVariant() {
+    const variant = variants.find(v =>
+      v.size === sizeSelect.value &&
+      v.color === colorSelect.value
+    );
 
-  // const stockStatus = document.getElementById('stockStatus');
 
-  if (variant) {
-    priceEl.innerText = "Rs " + parseFloat(variant.price).toLocaleString('en-PK', {maximumFractionDigits:0});
-    
-    // Show stock status
-    if (variant.stock > 10) {
-      stockStatus.innerHTML = '<span style="color: green;"><i class="fas fa-check-circle"></i> In Stock</span>';
-    } else if (variant.stock > 0) {
-      stockStatus.innerHTML = `<span style="color: orange;"><i class="fas fa-exclamation-triangle"></i> Only ${variant.stock} left!</span>`;
+    if (variant) {
+      priceEl.innerText = "Rs " + parseFloat(variant.price).toLocaleString('en-PK', {maximumFractionDigits:0});
+      
+      // Show stock status
+      if (stockStatus) {
+        if (variant.stock > 10) {
+          stockStatus.innerHTML = '<span style="color: green;"><i class="fas fa-check-circle"></i> In Stock</span>';
+        } else if (variant.stock > 0) {
+          stockStatus.innerHTML = `<span style="color: orange;"><i class="fas fa-exclamation-triangle"></i> Only ${variant.stock} left!</span>`;
+        } else {
+          stockStatus.innerHTML = '<span style="color: red;"><i class="fas fa-times-circle"></i> Out of Stock</span>';
+        }
+      }
     } else {
-      stockStatus.innerHTML = '<span style="color: red;"><i class="fas fa-times-circle"></i> Out of Stock</span>';
+      priceEl.innerText = "Not available";
+      if (stockStatus) {
+        stockStatus.innerHTML = '<span style="color: red;">Combination not available</span>';
+      }
     }
-  } else {
-    priceEl.innerText = "Not available";
-    stockStatus.innerHTML = '<span style="color: red;">Combination not available</span>';
   }
-}
+
 
   sizeSelect.addEventListener("change", updateVariant);
   colorSelect.addEventListener("change", updateVariant);
 
+
   updateVariant();
+
 
   // GET SELECTED VARIANT
   function getVariant() {
@@ -181,20 +224,25 @@ function updateVariant() {
     );
   }
 
+
   // ADD TO CART
   addToCartBtn.addEventListener('click', function() {
     const variant = getVariant();
+
 
     if (!variant) {
       alert("Please choose correct size and color");
       return;
     }
 
+
     const quantity = parseInt(qtyInput.value);
+
 
     // Disable button
     addToCartBtn.disabled = true;
     addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
 
     fetch("/cart/add", {
       method: "POST",
@@ -215,6 +263,7 @@ function updateVariant() {
     .then(data => {
       if (!data) return;
 
+
       if (data.success) {
         // Animation
         if (typeof addToCartAnimation === 'function') {
@@ -230,6 +279,7 @@ function updateVariant() {
         if (typeof updateCartDrawer === 'function') {
           updateCartDrawer();
         }
+
 
         // Re-enable button
         addToCartBtn.disabled = false;
@@ -248,20 +298,25 @@ function updateVariant() {
     });
   });
 
+
   // BUY NOW
   buyNowBtn.addEventListener('click', function() {
     const variant = getVariant();
+
 
     if (!variant) {
       alert("Please select size and color");
       return;
     }
 
+
     const quantity = parseInt(qtyInput.value);
+
 
     // Disable button
     buyNowBtn.disabled = true;
     buyNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
 
     fetch("/cart/add", {
       method: "POST",
@@ -282,6 +337,7 @@ function updateVariant() {
     .then(data => {
       if (!data) return;
 
+
       if (data.success) {
         window.location.href = '/checkout';
       } else {
@@ -298,12 +354,14 @@ function updateVariant() {
     });
   });
 
+
   // IMAGE SWITCH
   function changeImage(el) {
     document.getElementById("mainImg").src = el.src;
     document.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
     el.classList.add("active");
   }
+
 
   // QTY
   function changeQty(val) {
@@ -312,6 +370,7 @@ function updateVariant() {
     if (v < 1) v = 1;
     qtyInput.value = v;
   }
+
 
   // Update cart count without reload
   function updateCartCount() {
@@ -336,6 +395,7 @@ function updateVariant() {
       .catch(err => console.error(err));
   }
 
+
   // Update cart drawer
   function updateCartDrawer() {
     fetch('/api/cart-items')
@@ -344,6 +404,7 @@ function updateVariant() {
         const cartBody = document.querySelector('.cart-drawer .cart-body');
         
         if (!cartBody) return;
+
 
         if (data.items && data.items.length > 0) {
           cartBody.innerHTML = data.items.map(item => `
@@ -358,7 +419,8 @@ function updateVariant() {
                 <span>Qty: ${item.quantity}</span>
               </div>
             </div>
-          `).join('');
+            `).join('');
+
 
           let footer = document.querySelector('.cart-drawer .cart-footer');
           if (!footer) {
@@ -372,6 +434,7 @@ function updateVariant() {
       .catch(err => console.error(err));
   }
 
+
   // Cart animation
   function addToCartAnimation() {
     const cartIcon = document.querySelector('.cart-icon');
@@ -379,211 +442,338 @@ function updateVariant() {
     
     if (!cartIcon) return;
 
+
     cartIcon.classList.add('cart-shake');
+
 
     if (cartWrapper) {
       cartWrapper.classList.add('active');
     }
 
+
     const sound = new Audio('/sounds/cart.mp3');
     sound.play().catch(() => {});
+
 
     setTimeout(() => {
       cartIcon.classList.remove('cart-shake');
     }, 400);
   }
 
-  // BUY NOW
-buyNowBtn.addEventListener('click', function() {
-  const variant = getVariant();
 
-  if (!variant) {
-    alert("Please select size and color");
-    return;
-  }
-
-  const quantity = parseInt(qtyInput.value);
-
-  // Disable button
-  buyNowBtn.disabled = true;
-  buyNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
-  fetch("/buy-now", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      product_id: variant.product_id,
-      variant_id: variant.variant_id,
-      quantity: quantity
-    })
-  })
-  .then(res => {
-    if (res.redirected) {
-      window.location.href = res.url;
-      return null;
-    }
-    return res.json();
-  })
-  .then(data => {
-    if (!data) return;
-
-    if (data.success) {
-      // Go directly to payment
-      window.location.href = `/payout?order=${data.orderId}`;
-    } else {
-      alert(data.message);
-      buyNowBtn.disabled = false;
-      buyNowBtn.innerHTML = 'Buy Now';
-    }
-  })
-  .catch(err => {
-    console.log(err);
-    alert('Error processing purchase');
-    buyNowBtn.disabled = false;
-    buyNowBtn.innerHTML = 'Buy Now';
-  });
-});
+  // BUY NOW - Direct to Payment
+  buyNowBtn.addEventListener('click', function() {
+    const variant = getVariant();
 
 
-const cartDrawer  = document.getElementById("cartDrawer");
-const cartOverlay = document.getElementById("cartOverlay");
-const cartIcon    = document.querySelector(".cart-icon");
-
-if (cartIcon) {
-  cartIcon.addEventListener("click", () => {
-    cartDrawer.classList.add("active");
-    cartOverlay.classList.add("active");
-  });
-}
-
-if (cartOverlay) {
-  cartOverlay.addEventListener("click", () => {
-    cartDrawer.classList.remove("active");
-    cartOverlay.classList.remove("active");
-  });
-}
-
-
-const menu     = document.getElementById("sideMenu");
-const overlay  = document.getElementById("overlay");
-const toggle   = document.getElementById("menuToggle");
-
-if (toggle) {
-  toggle.addEventListener("click", () => {
-    menu.classList.toggle("active");
-    overlay.classList.toggle("active");
-    toggle.classList.toggle("fa-bars");
-    toggle.classList.toggle("fa-times");
-  });
-}
-
-if (overlay) {
-  overlay.addEventListener("click", () => {
-    menu.classList.remove("active");
-    overlay.classList.remove("active");
-    toggle.classList.add("fa-bars");
-    toggle.classList.remove("fa-times");
-  });
-}
-
-// dropdowns
-document.querySelectorAll(".dropdown").forEach(d => {
-  const btn = d.querySelector(".drop-btn");
-  if (btn) {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      d.classList.toggle("active");
-    });
-  }
-});
-
-
-// ─── WHATSAPP CHAT FUNCTIONALITY ─────────────────────────
-
-const whatsappToggle = document.getElementById('whatsappToggle');
-const whatsappDrawer = document.getElementById('whatsappDrawer');
-const whatsappOverlay = document.getElementById('whatsappOverlay');
-const whatsappClose = document.getElementById('whatsappClose');
-const whatsappSend = document.getElementById('whatsappSend');
-const whatsappMessage = document.getElementById('whatsappMessage');
-
-// YOUR WHATSAPP NUMBER
-const WHATSAPP_NUMBER = '923166389642';
-
-// ─── TOGGLE FUNCTION ─────────────────────────
-function toggleWhatsapp() {
-  if (whatsappDrawer.classList.contains('active')) {
-    // Close
-    whatsappDrawer.classList.remove('active');
-    whatsappOverlay.classList.remove('active');
-  } else {
-    // Open
-    whatsappDrawer.classList.add('active');
-    whatsappOverlay.classList.add('active');
-    whatsappMessage.focus();
-  }
-}
-
-// Toggle on whatsapp icon click
-if (whatsappToggle) {
-  whatsappToggle.addEventListener('click', toggleWhatsapp);
-}
-
-// Close buttons
-if (whatsappClose) {
-  whatsappClose.addEventListener('click', toggleWhatsapp);
-}
-
-if (whatsappOverlay) {
-  whatsappOverlay.addEventListener('click', toggleWhatsapp);
-}
-
-// ─── SEND TO WHATSAPP ─────────────────────────
-if (whatsappSend) {
-  whatsappSend.addEventListener('click', () => {
-    const message = whatsappMessage.value.trim();
-    
-    if (!message) {
-      alert('Please enter a message');
-      whatsappMessage.focus();
+    if (!variant) {
+      alert("Please select size and color");
       return;
     }
-    
-    // Get current page URL and title
-    const currentPageUrl = window.location.href;
-    const currentPageTitle = document.title;
-    
-    // Format the message
-    const formattedMessage = 
-        `Message: ${message}%0a%0a` +
-      `URL: ${currentPageUrl}`;
-    
-    // Create WhatsApp URL
-    const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${formattedMessage}`;
-    
-    // Disable button during redirect
-    whatsappSend.disabled = true;
-    whatsappSend.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening...';
-    
-    // Redirect to WhatsApp
-    setTimeout(() => {
-      window.open(whatsappURL, '_blank');
-      
-      // Reset button
-      whatsappSend.disabled = false;
-      whatsappSend.innerHTML = '<i class="fas fa-paper-plane"></i> Send to WhatsApp';
-      
-      // Close drawer and clear message
-      toggleWhatsapp();
-      whatsappMessage.value = '';
-    }, 1000);
+
+
+    const quantity = parseInt(qtyInput.value);
+
+
+    buyNowBtn.disabled = true;
+    buyNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+
+    fetch("/buy-now", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product_id: variant.product_id,
+        variant_id: variant.variant_id,
+        quantity: quantity
+      })
+    })
+    .then(res => {
+      if (res.redirected) {
+        window.location.href = res.url;
+        return null;
+      }
+      return res.json();
+    })
+    .then(data => {
+      if (!data) return;
+
+
+      if (data.success) {
+        window.location.href = `/payout?order=${data.orderId}`;
+      } else {
+        alert(data.message);
+        buyNowBtn.disabled = false;
+        buyNowBtn.innerHTML = 'Buy Now';
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      alert('Error processing purchase');
+      buyNowBtn.disabled = false;
+      buyNowBtn.innerHTML = 'Buy Now';
+    });
   });
-}
+
+
+  // ===============================
+  // 🟢 SIDE MENU
+  // ===============================
+  const menu = document.getElementById("sideMenu");
+  const overlay = document.getElementById("overlay");
+  const toggle = document.getElementById("menuToggle");
+
+
+  if (toggle) {
+    toggle.addEventListener("click", () => {
+      menu.classList.toggle("active");
+      overlay.classList.toggle("active");
+      toggle.classList.toggle("fa-bars");
+      toggle.classList.toggle("fa-times");
+    });
+  }
+
+
+  if (overlay) {
+    overlay.addEventListener("click", () => {
+      menu.classList.remove("active");
+      overlay.classList.remove("active");
+      if (toggle) {
+        toggle.classList.add("fa-bars");
+        toggle.classList.remove("fa-times");
+      }
+    });
+  }
+
+
+  // ===============================
+  // 🟢 CART DRAWER
+  // ===============================
+  const cartDrawer = document.getElementById("cartDrawer");
+  const cartOverlay = document.getElementById("cartOverlay");
+  const cartIcon = document.querySelector(".cart-icon");
+
+
+  if (cartIcon) {
+    cartIcon.addEventListener("click", () => {
+      if (cartDrawer) cartDrawer.classList.add("active");
+      if (cartOverlay) cartOverlay.classList.add("active");
+    });
+  }
+
+
+  if (cartOverlay) {
+    cartOverlay.addEventListener("click", () => {
+      if (cartDrawer) cartDrawer.classList.remove("active");
+      cartOverlay.classList.remove("active");
+    });
+  }
+
+
+  // ===============================
+  // 🟢 SEARCH
+  // ===============================
+  const searchBtn = document.getElementById("search_top");
+  const searchOverlay = document.getElementById("searchOverlay");
+  const searchInput = document.getElementById("searchInput");
+  const searchClose = document.getElementById("searchClose");
+
+
+  if (searchBtn && searchOverlay) {
+    searchBtn.addEventListener("click", () => {
+      searchOverlay.classList.add("active");
+      if (searchInput) searchInput.focus();
+    });
+  }
+
+
+  function closeSearch() {
+    if (searchOverlay) searchOverlay.classList.remove("active");
+    if (searchInput) searchInput.value = "";
+  }
+
+
+  if (searchClose) {
+    searchClose.addEventListener("click", closeSearch);
+  }
+
+
+  if (searchInput) {
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const query = searchInput.value.trim();
+        if (query !== "") {
+          window.location.href = `/list?search=${encodeURIComponent(query)}`;
+        }
+      }
+    });
+  }
+
+
+  // ===============================
+  // 🟢 GLOBAL ESC HANDLER
+  // ===============================
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeSearch();
+      if (cartDrawer) cartDrawer.classList.remove("active");
+      if (cartOverlay) cartOverlay.classList.remove("active");
+      if (menu) menu.classList.remove("active");
+      if (overlay) overlay.classList.remove("active");
+      if (toggle) {
+        toggle.classList.add("fa-bars");
+        toggle.classList.remove("fa-times");
+      }
+    }
+  });
+
+
+  // ===============================
+  // 🟢 IMAGE SWITCH (PRODUCT PAGE)
+  // ===============================
+  const mainImg = document.getElementById("mainImg");
+  const thumbs = document.querySelectorAll(".thumb");
+
+
+  thumbs.forEach(img => {
+    img.addEventListener("click", () => {
+      if (mainImg) mainImg.src = img.src;
+      thumbs.forEach(t => t.classList.remove("active"));
+      img.classList.add("active");
+    });
+  });
+
+
+  // ===============================
+  // 🟢 WHATSAPP ORDER BUTTON
+  // ===============================
+  const whatsappOrderBtn = document.getElementById('whatsappOrderBtn');
+
+
+  if (whatsappOrderBtn) {
+    whatsappOrderBtn.addEventListener('click', function() {
+      const currentPageUrl = window.location.href;
+      const currentPageTitle = document.title;
+      const whatsappNumber = '923166389642';
+      
+      const formattedMessage = 
+          `I want to order this product:\n\n` +
+          `Product: ${currentPageTitle}\n\n` +
+          `URL: ${currentPageUrl}`;
+      
+      const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
+      window.open(whatsappURL, '_blank');
+    });
+  }
+
+
+  // ===============================
+  // 🟢 WHATSAPP CHAT FUNCTIONALITY
+  // ===============================
+  const whatsappToggle = document.getElementById('whatsappToggle');
+  const whatsappDrawer = document.getElementById('whatsappDrawer');
+  const whatsappOverlay = document.getElementById('whatsappOverlay');
+  const whatsappClose = document.getElementById('whatsappClose');
+  const whatsappSend = document.getElementById('whatsappSend');
+  const whatsappMessage = document.getElementById('whatsappMessage');
+
+
+  const WHATSAPP_NUMBER = '923166389642';
+
+
+  function toggleWhatsapp() {
+    if (whatsappDrawer && whatsappDrawer.classList.contains('active')) {
+      whatsappDrawer.classList.remove('active');
+      if (whatsappOverlay) whatsappOverlay.classList.remove('active');
+    } else {
+      if (whatsappDrawer) whatsappDrawer.classList.add('active');
+      if (whatsappOverlay) whatsappOverlay.classList.add('active');
+      if (whatsappMessage) whatsappMessage.focus();
+    }
+  }
+
+
+  if (whatsappToggle) {
+    whatsappToggle.addEventListener('click', toggleWhatsapp);
+  }
+
+
+  if (whatsappClose) {
+    whatsappClose.addEventListener('click', toggleWhatsapp);
+  }
+
+
+  if (whatsappOverlay) {
+    whatsappOverlay.addEventListener('click', toggleWhatsapp);
+  }
+
+
+  if (whatsappSend) {
+    whatsappSend.addEventListener('click', () => {
+      const message = whatsappMessage.value.trim();
+      
+      if (!message) {
+        alert('Please enter a message');
+        if (whatsappMessage) whatsappMessage.focus();
+        return;
+      }
+      
+      const currentPageUrl = window.location.href;
+      const currentPageTitle = document.title;
+      
+      const formattedMessage = 
+          `Message: ${message}\n\n` +
+          `Product: ${currentPageTitle}\n\n` +
+          `URL: ${currentPageUrl}`;
+      
+      const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(formattedMessage)}`;
+      
+      whatsappSend.disabled = true;
+      whatsappSend.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening...';
+      
+      setTimeout(() => {
+        window.open(whatsappURL, '_blank');
+        whatsappSend.disabled = false;
+        whatsappSend.innerHTML = '<i class="fas fa-paper-plane"></i> Send to WhatsApp';
+        toggleWhatsapp();
+        if (whatsappMessage) whatsappMessage.value = '';
+      }, 1000);
+    });
+  }
+
+
+  // ===============================
+  // 🟢 DROPDOWNS
+  // ===============================
+  document.querySelectorAll(".dropdown").forEach(d => {
+    const btn = d.querySelector(".drop-btn");
+    if (btn) {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        d.classList.toggle("active");
+      });
+    }
+  });
+
+
+  // ===============================
+  // 🟢 TRACK RECENTLY VIEWED
+  // ===============================
+  function trackRecentlyViewed(productId) {
+    let recent = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+    recent = recent.filter(id => id !== productId);
+    recent.unshift(productId);
+    recent = recent.slice(0, 10);
+    localStorage.setItem('recentlyViewed', JSON.stringify(recent));
+  }
+
+
+  const productId = <%= product.productid %>;
+  trackRecentlyViewed(productId);
 
 
 </script>
 
-<script src="/js/product.js"></script>
 
 </body>
 </html>
