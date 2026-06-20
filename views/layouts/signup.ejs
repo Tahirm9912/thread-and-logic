@@ -11,20 +11,28 @@
     <link rel="shortcut icon" href="/images/icon.ico" type="image/x-icon">
 </head>
 
+
 <body>
+
 
 <%- include("../partials/header-nscm") %>
 
+
 <section class="auth-section">
+
 
   <div class="auth-container">
 
+
     <h2>Create Account</h2>
+
 
     <form action="/api/auth/register" method="POST" class="auth-form">
 
+
       <!-- HIDDEN FIELD: Store returnUrl -->
       <input type="hidden" name="returnUrl" value="<%= returnUrl %>">
+
 
       <!-- NAME -->
       <div class="form-group">
@@ -32,17 +40,20 @@
         <input name="name" type="text" placeholder="Enter your name" required>
       </div>
 
+
       <!-- EMAIL -->
       <div class="form-group">
         <label>Email</label>
         <input name="email" type="email" placeholder="Enter your email" required>
       </div>
 
+
       <!-- PHONE -->
       <div class="form-group">
         <label>Phone Number</label>
-        <input name="tel" type="tel" placeholder="03XXXXXXXXX" required>
+        <input name="tel" type="tel" placeholder="Enter your phone number" required>
       </div>
+
 
       <!-- ADDRESS -->
       <div class="form-group">
@@ -50,17 +61,20 @@
         <textarea name="address" placeholder="Enter your complete address" required></textarea>
       </div>
 
+
       <!-- POSTAL CODE -->
       <div class="form-group">
         <label>Postal Code</label>
-        <input name="postal_code" type="text" placeholder="49600" required>
+        <input name="postal_code" type="text" placeholder="Enter postal code" required>
       </div>
+
 
       <!-- PASSWORD -->
       <div class="form-group">
         <label>Password</label>
         <input name="password" type="password" placeholder="Enter password (min 8 characters)" minlength="8" required>
       </div>
+
 
 <!-- CHECKBOXES -->
 <div class="form-check">
@@ -70,6 +84,7 @@
   </label>
 </div>
 
+
       <div class="form-check">
         <label>
           <input name="allow_promotions" type="checkbox">
@@ -77,8 +92,10 @@
         </label>
       </div>
 
+
       <!-- BUTTON -->
       <button type="submit" class="auth-btn">Create Account</button>
+
 
       <% if (error) { %>
         <div class="auth-message" id="notification_pan">
@@ -88,16 +105,21 @@
         </div>
       <% } %>
 
+
     </form>
+
 
     <p class="auth-switch">
       Already have an account? 
       <a href="/login?returnUrl=<%= encodeURIComponent(returnUrl) %>">Sign In</a>
     </p>
 
+
   </div>
 
+
 </section>
+
 
 <script>
   const pan = document.getElementById("notification_pan");
@@ -107,6 +129,7 @@
     }, 3000);
   }
 </script>
+
 
 </body>
 </html>

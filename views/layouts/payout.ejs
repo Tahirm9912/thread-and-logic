@@ -57,7 +57,7 @@
 
 <div class="summary-item">
   <span>Delivery</span>
-  <span>Rs 200</span>
+  <span>Rs 300 </span>
 </div>
 
 <hr>
@@ -65,13 +65,13 @@
 <div class="summary-total">
   <span>Total</span>
   <span>
-    Rs <%= order ? Number(parseFloat(order.total_amount) + 200).toLocaleString('en-PK', { maximumFractionDigits: 0 }) : 200 %>
+    Rs <%= order ? Number(parseFloat(order.total_amount) + 300).toLocaleString('en-PK', { maximumFractionDigits: 0 }) : 200 %>
   </span>
 </div>
 
-      <button onclick="confirmOrder(<%= order ? order.id : 0 %>)" class="pay-btn">
-        Confirm Order
-      </button>
+<button onclick="confirmOrder(<%= order ? order.id : 0 %>, <%= order.customer_name ? true : false %>)" class="pay-btn">
+  Confirm Order
+</button>
 
     </div>
 

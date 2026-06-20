@@ -12,6 +12,7 @@ import {
   forgotPassword,
   resetPassword  
 } from "../controllers/authController.js";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -380,21 +381,141 @@ router.get("/order/:id", requireAuth, async (req, res) => {
   }
 });
 
-
-// Buy Now - Direct checkout for single product
-router.post("/buy-now", requireAuth, async (req, res) => {
+// Render direct order form (for non-logged in users)
+// GET /direct-order - Render the direct order form
+// GET /direct-order - Render the direct order form
+// GET /direct-order - Render the direct order form
+router.get("/direct-order", async (req, res) => {
   try {
-    const { product_id, variant_id, quantity } = req.body;
-    const userId = req.user.userid;
+    const { 
+      product, 
+      variant, 
+      quantity, 
+      size, 
+      color, 
+      customization, 
+      isCustom, 
+      total 
+    } = req.query;
 
-    if (!product_id || !variant_id || !quantity) {
-      return res.status(400).json({ success: false, message: "Missing data" });
+
+    if (!product || !variant || !quantity) {
+      return res.status(400).json({ success: false, message: "Missing product data" });
     }
+
+
+    // Get product details (products table uses productid)
+    const productData = await pool.query(
+      "SELECT * FROM products WHERE productid = $1",
+      [product]
+    );
+
+
+    if (productData.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+
+    // Get product image (product_images table uses product_id)
+    const images = await pool.query(
+      "SELECT image_url FROM product_images WHERE product_id = $1 LIMIT 1",
+      [product]
+    );
+
+
+    const productImage = images.rows.length > 0 ? images.rows[0].image_url : '/images/default.jpg';
+
+
+    // Calculate total if not provided
+    const totalAmount = total || (parseFloat(productData.rows[0].price) * parseInt(quantity)).toFixed(2);
+
+
+    // Render direct-order.ejs
+    res.render('layouts/direct-order', {
+      product: productData.rows[0],
+      productImage,
+      productId: product,
+      variantId: variant,
+      quantity: quantity,
+      size: size,
+      color: color,
+      customizationNote: customization || null,
+      isCustom: isCustom || false,
+      totalAmount: totalAmount
+    });
+
+
+  } catch (err) {
+    console.error("Direct order error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// POST /direct-order/confirm - Confirm direct order payment
+router.post("/direct-order/confirm", async (req, res) => {
+  try {
+    const { orderId, method } = req.body;
+
+
+    if (!orderId) {
+      return res.status(400).json({ success: false, message: "Missing order ID" });
+    }
+
+
+    if (method !== "COD") {
+      return res.status(400).json({ success: false, message: "Invalid payment method" });
+    }
+
+
+    // Update direct order status
+    await pool.query(
+      "UPDATE direct_orders SET status = 'confirmed' WHERE id = $1",
+      [orderId]
+    );
+
+
+    return res.json({ success: true, message: "Order confirmed successfully!" });
+
+
+  } catch (err) {
+    console.error("Direct order confirm error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+
+// Submit direct order and create order
+// POST /direct-order/submit - Submit the direct order form
+router.post("/direct-order/submit", async (req, res) => {
+  try {
+    const {
+      product_id,
+      variant_id,
+      quantity,
+      size,
+      color,
+      customization_note,
+      is_custom,
+      total_amount,
+      customer_name,
+      customer_email,
+      customer_phone,
+      customer_address,
+      postal_code
+    } = req.body;
+
+
+    // Validate required fields
+    if (!product_id || !variant_id || !quantity || !customer_name || !customer_email || !customer_phone || !customer_address) {
+      return res.status(400).json({ success: false, message: "Missing required data" });
+    }
+
 
     const qty = parseInt(quantity);
     if (qty < 1) {
       return res.status(400).json({ success: false, message: "Invalid quantity" });
     }
+
 
     // Get variant details
     const variant = await pool.query(
@@ -402,40 +523,183 @@ router.post("/buy-now", requireAuth, async (req, res) => {
       [variant_id, product_id]
     );
 
+
     if (variant.rows.length === 0) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
+
 
     if (variant.rows[0].stock < qty) {
       return res.status(400).json({ success: false, message: "Not enough stock" });
     }
 
+
+    // Save to direct_orders table
+    const result = await pool.query(`
+      INSERT INTO direct_orders 
+      (product_id, variant_id, quantity, size, color, customization_note, is_custom, customer_name, customer_email, customer_phone, customer_address, postal_code, status, total_amount)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pending', $13)
+      RETURNING id
+    `, [product_id, variant_id, qty, size || null, color || null, customization_note || null, is_custom || false, customer_name, customer_email, customer_phone, customer_address, postal_code, total_amount]);
+
+
+    const directOrderId = result.rows[0].id;
+
+
+    // Update stock
+    await pool.query(
+      "UPDATE product_variants SET stock = stock - $1 WHERE variant_id = $2",
+      [qty, variant_id]
+    );
+
+
+    // Redirect to payout-direct (for non-logged-in users)
+    return res.redirect(`/payout-direct?order=${directOrderId}`);
+
+
+  } catch (err) {
+    console.error("Direct order submit error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+
+// Buy Now - Direct checkout for single product
+router.post("/buy-now", async (req, res) => {
+  try {
+    const { product_id, variant_id, quantity, customizationNote, isCustom, size, color } = req.body;
+    
+    // Check if user has token
+    const token = req.cookies?.token;
+    let userId = null;
+
+
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.userid;
+    }
+
+
+    if (!product_id || !variant_id || !quantity) {
+      return res.status(400).json({ success: false, message: "Missing data" });
+    }
+
+
+    const qty = parseInt(quantity);
+    if (qty < 1) {
+      return res.status(400).json({ success: false, message: "Invalid quantity" });
+    }
+
+
+    // Get variant details
+    const variant = await pool.query(
+      "SELECT * FROM product_variants WHERE variant_id = $1 AND product_id = $2",
+      [variant_id, product_id]
+    );
+
+
+    if (variant.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+
+    if (variant.rows[0].stock < qty) {
+      return res.status(400).json({ success: false, message: "Not enough stock" });
+    }
+
+
     const price = parseFloat(variant.rows[0].price);
     const total = (price * qty).toFixed(2);
 
-    // Create order directly (skip cart)
-    const order = await pool.query(`
-      INSERT INTO orders (user_id, status, total_amount, payment_status)
-      VALUES ($1, 'pending', $2, 'unpaid')
-      RETURNING id
-    `, [userId, total]);
 
-    const orderId = order.rows[0].id;
+    // IF TOKEN FOUND: Create order and redirect to payout
+    if (userId) {
+      const order = await pool.query(`
+        INSERT INTO orders (user_id, status, total_amount, payment_status)
+        VALUES ($1, 'pending', $2, 'unpaid')
+        RETURNING id
+      `, [userId, total]);
 
-    // Insert order item
-    await pool.query(`
-      INSERT INTO order_items (order_id, product_id, variant_id, quantity, price)
-      VALUES ($1, $2, $3, $4, $5)
-    `, [orderId, product_id, variant_id, qty, price]);
 
-    // Return order ID for payout
-    return res.json({ success: true, orderId });
+      const orderId = order.rows[0].id;
+
+
+      await pool.query(`
+        INSERT INTO order_items (order_id, product_id, variant_id, quantity, price, customization_note, is_custom)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `, [orderId, product_id, variant_id, qty, price, customizationNote || null, isCustom || false]);
+
+
+      return res.redirect(`/payout?order=${orderId}`);
+
+
+    } else {
+      // IF NO TOKEN: Redirect to direct-order with product data (no INSERT yet)
+      return res.redirect(`/direct-order?product=${product_id}&variant=${variant_id}&quantity=${quantity}&size=${size || ''}&color=${color || ''}&customization=${encodeURIComponent(customizationNote || '')}&isCustom=${isCustom || false}&total=${total}`);
+    }
+
 
   } catch (err) {
     console.error("Buy now error:", err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
+
+// New route for direct orders (non-logged-in users)
+router.get("/payout-direct", async (req, res) => {
+  try {
+    const orderId = req.query.order;
+
+
+    if (!orderId) {
+      return res.redirect("/checkout");
+    }
+
+
+    // Get direct order data
+    const order = await pool.query(
+      "SELECT * FROM direct_orders WHERE id = $1",
+      [orderId]
+    );
+
+
+    if (order.rows.length === 0) {
+      return res.redirect("/checkout");
+    }
+
+
+    const orderData = order.rows[0];
+
+
+    // Get order items
+    const items = await pool.query(`
+      SELECT 
+        oi.quantity,
+        oi.price,
+        p.name,
+        pi.image_url
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.productid
+      LEFT JOIN product_images pi 
+        ON pi.product_id = p.productid AND pi.is_primary = true
+      WHERE oi.order_id = $1
+    `, [orderId]);
+
+
+    return res.render("layouts/payout", {
+      order: orderData,
+      items: items.rows,
+      isDirectOrder: true  // <-- ADD THIS
+    });
+
+
+  } catch (err) {
+    console.error("Payout direct error:", err);
+    return res.redirect("/checkout");
+  }
+});
+
 
 router.post("/contact/submit", submitContactForm);
 

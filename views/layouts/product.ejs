@@ -24,7 +24,7 @@
 
   <!-- LEFT SIDE - IMAGES -->
   <div class="product-images">
-    
+
     <!-- MAIN IMAGE -->
     <div class="main-image">
       <% if (images && images.length > 0) { %>
@@ -39,8 +39,8 @@
     <% if (images && images.length > 0) { %>
       <div class="thumbs">
         <% images.forEach((img, index) => { %>
-          <img 
-            src="<%= img.image_url %>" 
+          <img
+            src="<%= img.image_url %>"
             alt="<%= img.alt_text || product.name %>"
             class="thumb <%= index === 0 ? 'active' : '' %>"
             onclick="changeImage(this)">
@@ -102,6 +102,13 @@
       </select>
 
 
+      <!-- CUSTOMIZATION NOTE (Hidden by default) -->
+      <div id="customizationNoteDiv" class="customization-note-input" style="display: none;">
+        <label for="customizationNote">Customization Details (Size, Color, Requirements, etc.)</label>
+        <textarea id="customizationNote" placeholder="Describe your customization requirements... e.g., Size: 24 inches, Color: Navy Blue, Extra large, etc." rows="4"></textarea>
+      </div>
+
+
       <!-- QUANTITY -->
       <label>Quantity</label>
       <div class="qty-box">
@@ -121,8 +128,8 @@
 
 
     <!-- WHATSAPP ORDER BUTTON -->
-    <a href="javascript:void(0)" 
-       class="btn-whatsapp" 
+    <a href="javascript:void(0)"
+       class="btn-whatsapp"
        id="whatsappOrderBtn">
       <i class="fab fa-whatsapp"></i> Order through WhatsApp
     </a>
@@ -138,7 +145,7 @@
 <% if (relatedProducts && relatedProducts.length > 0) { %>
 <section class="related-products">
   <h2>You May Also Like</h2>
-  
+
   <div class="related-grid">
     <% relatedProducts.forEach(product => { %>
       <div class="related-card">
@@ -172,6 +179,8 @@
 
   const sizeSelect = document.getElementById("sizeSelect");
   const colorSelect = document.getElementById("colorSelect");
+  const customizationNoteDiv = document.getElementById("customizationNoteDiv");
+  const customizationNoteInput = document.getElementById("customizationNote");
   const priceEl = document.getElementById("price");
   const qtyInput = document.getElementById("qty");
   const addToCartBtn = document.getElementById("addToCartBtn");
@@ -179,18 +188,71 @@
   const stockStatus = document.getElementById('stockStatus');
 
 
+  // ===============================
+  // 🟢 HANDLE CUSTOMIZED SIZE/COLOR
+  // ===============================
+  function handleCustomizedOptions() {
+    const size = sizeSelect.value;
+    const color = colorSelect.value;
+
+    // Check if size is "Customized" OR color is "Customized"
+    const isCustomSize = size.toLowerCase().includes("customized") || size.toLowerCase().includes("custom");
+    const isCustomColor = color.toLowerCase().includes("customized") || color.toLowerCase().includes("custom");
+
+    if (isCustomSize || isCustomColor) {
+      customizationNoteDiv.style.display = "block";
+      addToCartBtn.disabled = true;
+      addToCartBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Custom Options - Use Buy Now or WhatsApp';
+      addToCartBtn.title = "Custom options require manual confirmation";
+    } else {
+      customizationNoteDiv.style.display = "none";
+      if (customizationNoteInput) customizationNoteInput.value = "";
+
+      // Re-enable Add to Cart
+      addToCartBtn.disabled = false;
+      addToCartBtn.innerHTML = 'Add to Cart';
+      addToCartBtn.title = "";
+    }
+  }
+
+
+  sizeSelect.addEventListener("change", () => {
+    handleCustomizedOptions();
+    updateVariant();
+  });
+
+  colorSelect.addEventListener("change", () => {
+    handleCustomizedOptions();
+    updateVariant();
+  });
+
+
   // UPDATE PRICE
   function updateVariant() {
-    const variant = variants.find(v =>
-      v.size === sizeSelect.value &&
-      v.color === colorSelect.value
-    );
+    const size = sizeSelect.value;
+    const color = colorSelect.value;
+
+    let variant = null;
+
+    const isCustomSize = size.toLowerCase().includes("customized") || size.toLowerCase().includes("custom");
+    const isCustomColor = color.toLowerCase().includes("customized") || color.toLowerCase().includes("custom");
+
+    if (isCustomSize) {
+      variant = variants.find(v =>
+        v.size.toLowerCase().includes("custom") && v.color === color
+      );
+    } else if (isCustomColor) {
+      variant = variants.find(v =>
+        v.size === size && v.color.toLowerCase().includes("custom")
+      );
+    } else {
+      variant = variants.find(v => v.size === size && v.color === color);
+    }
 
 
     if (variant) {
       priceEl.innerText = "Rs " + parseFloat(variant.price).toLocaleString('en-PK', {maximumFractionDigits:0});
-      
-      // Show stock status
+
       if (stockStatus) {
         if (variant.stock > 10) {
           stockStatus.innerHTML = '<span style="color: green;"><i class="fas fa-check-circle"></i> In Stock</span>';
@@ -209,24 +271,50 @@
   }
 
 
-  sizeSelect.addEventListener("change", updateVariant);
-  colorSelect.addEventListener("change", updateVariant);
-
-
   updateVariant();
 
 
   // GET SELECTED VARIANT
   function getVariant() {
-    return variants.find(v =>
-      v.size === sizeSelect.value &&
-      v.color === colorSelect.value
-    );
+    const size = sizeSelect.value;
+    const color = colorSelect.value;
+
+    let variant = null;
+
+    const isCustomSize = size.toLowerCase().includes("customized") || size.toLowerCase().includes("custom");
+    const isCustomColor = color.toLowerCase().includes("customized") || color.toLowerCase().includes("custom");
+
+    if (isCustomSize) {
+      variant = variants.find(v =>
+        v.size.toLowerCase().includes("custom") && v.color === color
+      );
+    } else if (isCustomColor) {
+      variant = variants.find(v =>
+        v.size === size && v.color.toLowerCase().includes("custom")
+      );
+    } else {
+      variant = variants.find(v => v.size === size && v.color === color);
+    }
+
+    return variant;
   }
 
 
-  // ADD TO CART
+  // ===============================
+  // 🟢 ADD TO CART
+  // ===============================
   addToCartBtn.addEventListener('click', function() {
+    const size = sizeSelect.value;
+    const color = colorSelect.value;
+
+    const isCustomSize = size.toLowerCase().includes("customized") || size.toLowerCase().includes("custom");
+    const isCustomColor = color.toLowerCase().includes("customized") || color.toLowerCase().includes("custom");
+
+    if (isCustomSize || isCustomColor) {
+      alert("Custom options cannot be added to cart. Please use Buy Now or WhatsApp Order.");
+      return;
+    }
+
     const variant = getVariant();
 
 
@@ -239,7 +327,6 @@
     const quantity = parseInt(qtyInput.value);
 
 
-    // Disable button
     addToCartBtn.disabled = true;
     addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
@@ -265,23 +352,19 @@
 
 
       if (data.success) {
-        // Animation
         if (typeof addToCartAnimation === 'function') {
           addToCartAnimation();
         }
-        
-        // Update cart count
+
         if (typeof updateCartCount === 'function') {
           updateCartCount();
         }
-        
-        // Update cart drawer
+
         if (typeof updateCartDrawer === 'function') {
           updateCartDrawer();
         }
 
 
-        // Re-enable button
         addToCartBtn.disabled = false;
         addToCartBtn.innerHTML = 'Add to Cart';
       } else {
@@ -299,63 +382,113 @@
   });
 
 
-  // BUY NOW
-  buyNowBtn.addEventListener('click', function() {
-    const variant = getVariant();
+// ===============================
+// 🟢 BUY NOW - Direct to Payment
+// ===============================
+buyNowBtn.addEventListener('click', function() {
+  const variant = getVariant();
+  const size = sizeSelect.value;
+  const color = colorSelect.value;
+  const quantity = parseInt(qtyInput.value);
+  const customizationNote = customizationNoteInput ? customizationNoteInput.value.trim() : "";
+  
+  // Check if order is customized (either size or color)
+  const isCustomSize = size.toLowerCase().includes("customized") || size.toLowerCase().includes("custom");
+  const isCustomColor = color.toLowerCase().includes("customized") || color.toLowerCase().includes("custom");
+  const isCustom = isCustomSize || isCustomColor;
 
 
-    if (!variant) {
-      alert("Please select size and color");
-      return;
+  if (!variant) {
+    alert("Please select size and color");
+    return;
+  }
+
+
+  buyNowBtn.disabled = true;
+  buyNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+
+  fetch("/buy-now", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      product_id: variant.product_id,
+      variant_id: variant.variant_id,
+      quantity: quantity,
+      size: size,
+      color: color,
+      customizationNote: customizationNote,
+      isCustom: isCustom
+    })
+  })
+  .then(res => {
+    if (res.redirected) {
+      window.location.href = res.url;
+      return null;
     }
+    return res.json();
+  })
+  .then(data => {
+    if (!data) return;
 
 
-    const quantity = parseInt(qtyInput.value);
-
-
-    // Disable button
-    buyNowBtn.disabled = true;
-    buyNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
-
-    fetch("/cart/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        product_id: variant.product_id,
-        variant_id: variant.variant_id,
-        quantity: quantity
-      })
-    })
-    .then(res => {
-      if (res.redirected) {
-        window.location.href = res.url;
-        return null;
-      }
-      return res.json();
-    })
-    .then(data => {
-      if (!data) return;
-
-
-      if (data.success) {
-        window.location.href = '/checkout';
-      } else {
-        alert(data.message);
-        buyNowBtn.disabled = false;
-        buyNowBtn.innerHTML = 'Buy Now';
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      alert('Error processing purchase');
+    if (data.success) {
+      window.location.href = `/payout?order=${data.orderId}`;
+    } else {
+      alert(data.message);
       buyNowBtn.disabled = false;
       buyNowBtn.innerHTML = 'Buy Now';
-    });
+    }
+  })
+  .catch(err => {
+    console.log(err);
+    alert('Error processing purchase');
+    buyNowBtn.disabled = false;
+    buyNowBtn.innerHTML = 'Buy Now';
   });
+});
 
 
-  // IMAGE SWITCH
+
+
+// ===============================
+  // 🟢 WHATSAPP ORDER BUTTON
+  // ===============================
+  const whatsappOrderBtn = document.getElementById('whatsappOrderBtn');
+
+
+  if (whatsappOrderBtn) {
+    whatsappOrderBtn.addEventListener('click', function() {
+      const currentPageUrl = window.location.href;
+      const currentPageTitle = document.title;
+      const whatsappNumber = '923166389642';
+
+      const size = sizeSelect.value;
+      const color = colorSelect.value;
+      const quantity = qtyInput.value;
+      const customizationNote = customizationNoteInput ? customizationNoteInput.value.trim() : "";
+
+      let message = `I want to order this product:\n\n`;
+      message += `Product: ${currentPageTitle}\n`;
+      message += `Size: ${size}\n`;
+      message += `Color: ${color}\n`;
+      message += `Quantity: ${quantity}\n\n`;
+
+      if (customizationNote) {
+        message += `📝 Customization Details:\n${customizationNote}\n`;
+      }
+
+      message += `\nURL: ${currentPageUrl}`;
+
+      const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappURL, '_blank');
+    });
+  }
+
+
+  // ===============================
+  // 🟢 OTHER FUNCTIONS
+  // ===============================
   function changeImage(el) {
     document.getElementById("mainImg").src = el.src;
     document.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
@@ -363,7 +496,6 @@
   }
 
 
-  // QTY
   function changeQty(val) {
     let v = parseInt(qtyInput.value);
     v += val;
@@ -372,14 +504,13 @@
   }
 
 
-  // Update cart count without reload
   function updateCartCount() {
     fetch('/api/cart-count')
       .then(res => res.json())
       .then(data => {
         const badge = document.querySelector('.cart-badge');
         const wrapper = document.querySelector('.cart-wrapper');
-        
+
         if (data.count > 0) {
           if (badge) {
             badge.textContent = data.count;
@@ -396,13 +527,12 @@
   }
 
 
-  // Update cart drawer
   function updateCartDrawer() {
     fetch('/api/cart-items')
       .then(res => res.json())
       .then(data => {
         const cartBody = document.querySelector('.cart-drawer .cart-body');
-        
+
         if (!cartBody) return;
 
 
@@ -413,6 +543,7 @@
               <div class="cart-item-info">
                 <h4>${item.name}</h4>
                 <p>${item.size} • ${item.color}</p>
+                ${item.customizationNote ? `<p><small>📝 Customization: ${item.customizationNote}</small></p>` : ''}
                 <p class="cart-price">Rs ${parseFloat(item.price).toFixed(0)}</p>
               </div>
               <div class="cart-qty">
@@ -435,11 +566,10 @@
   }
 
 
-  // Cart animation
   function addToCartAnimation() {
     const cartIcon = document.querySelector('.cart-icon');
     const cartWrapper = document.querySelector('.cart-wrapper');
-    
+
     if (!cartIcon) return;
 
 
@@ -461,63 +591,8 @@
   }
 
 
-  // BUY NOW - Direct to Payment
-  buyNowBtn.addEventListener('click', function() {
-    const variant = getVariant();
-
-
-    if (!variant) {
-      alert("Please select size and color");
-      return;
-    }
-
-
-    const quantity = parseInt(qtyInput.value);
-
-
-    buyNowBtn.disabled = true;
-    buyNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
-
-    fetch("/buy-now", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        product_id: variant.product_id,
-        variant_id: variant.variant_id,
-        quantity: quantity
-      })
-    })
-    .then(res => {
-      if (res.redirected) {
-        window.location.href = res.url;
-        return null;
-      }
-      return res.json();
-    })
-    .then(data => {
-      if (!data) return;
-
-
-      if (data.success) {
-        window.location.href = `/payout?order=${data.orderId}`;
-      } else {
-        alert(data.message);
-        buyNowBtn.disabled = false;
-        buyNowBtn.innerHTML = 'Buy Now';
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      alert('Error processing purchase');
-      buyNowBtn.disabled = false;
-      buyNowBtn.innerHTML = 'Buy Now';
-    });
-  });
-
-
   // ===============================
-  // 🟢 SIDE MENU
+  // 🟢 SIDE MENU, CART, SEARCH, WHATSAPP CHAT (Same as before)
   // ===============================
   const menu = document.getElementById("sideMenu");
   const overlay = document.getElementById("overlay");
@@ -546,9 +621,6 @@
   }
 
 
-  // ===============================
-  // 🟢 CART DRAWER
-  // ===============================
   const cartDrawer = document.getElementById("cartDrawer");
   const cartOverlay = document.getElementById("cartOverlay");
   const cartIcon = document.querySelector(".cart-icon");
@@ -570,9 +642,6 @@
   }
 
 
-  // ===============================
-  // 🟢 SEARCH
-  // ===============================
   const searchBtn = document.getElementById("search_top");
   const searchOverlay = document.getElementById("searchOverlay");
   const searchInput = document.getElementById("searchInput");
@@ -610,9 +679,6 @@
   }
 
 
-  // ===============================
-  // 🟢 GLOBAL ESC HANDLER
-  // ===============================
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeSearch();
@@ -628,9 +694,6 @@
   });
 
 
-  // ===============================
-  // 🟢 IMAGE SWITCH (PRODUCT PAGE)
-  // ===============================
   const mainImg = document.getElementById("mainImg");
   const thumbs = document.querySelectorAll(".thumb");
 
@@ -644,32 +707,6 @@
   });
 
 
-  // ===============================
-  // 🟢 WHATSAPP ORDER BUTTON
-  // ===============================
-  const whatsappOrderBtn = document.getElementById('whatsappOrderBtn');
-
-
-  if (whatsappOrderBtn) {
-    whatsappOrderBtn.addEventListener('click', function() {
-      const currentPageUrl = window.location.href;
-      const currentPageTitle = document.title;
-      const whatsappNumber = '923166389642';
-      
-      const formattedMessage = 
-          `I want to order this product:\n\n` +
-          `Product: ${currentPageTitle}\n\n` +
-          `URL: ${currentPageUrl}`;
-      
-      const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
-      window.open(whatsappURL, '_blank');
-    });
-  }
-
-
-  // ===============================
-  // 🟢 WHATSAPP CHAT FUNCTIONALITY
-  // ===============================
   const whatsappToggle = document.getElementById('whatsappToggle');
   const whatsappDrawer = document.getElementById('whatsappDrawer');
   const whatsappOverlay = document.getElementById('whatsappOverlay');
@@ -683,11 +720,11 @@
 
   function toggleWhatsapp() {
     if (whatsappDrawer && whatsappDrawer.classList.contains('active')) {
-      whatsappDrawer.classList.remove('active');
-      if (whatsappOverlay) whatsappOverlay.classList.remove('active');
+      whatsappDrawer.classList.remove("active");
+      if (whatsappOverlay) whatsappOverlay.classList.remove("active");
     } else {
-      if (whatsappDrawer) whatsappDrawer.classList.add('active');
-      if (whatsappOverlay) whatsappOverlay.classList.add('active');
+      if (whatsappDrawer) whatsappDrawer.classList.add("active");
+      if (whatsappOverlay) whatsappOverlay.classList.add("active");
       if (whatsappMessage) whatsappMessage.focus();
     }
   }
@@ -711,26 +748,30 @@
   if (whatsappSend) {
     whatsappSend.addEventListener('click', () => {
       const message = whatsappMessage.value.trim();
-      
+
       if (!message) {
         alert('Please enter a message');
         if (whatsappMessage) whatsappMessage.focus();
         return;
       }
-      
+
       const currentPageUrl = window.location.href;
       const currentPageTitle = document.title;
-      
-      const formattedMessage = 
+      const size = sizeSelect.value;
+      const color = colorSelect.value;
+
+      const formattedMessage =
           `Message: ${message}\n\n` +
-          `Product: ${currentPageTitle}\n\n` +
+          `Product: ${currentPageTitle}\n` +
+          `Size: ${size}\n` +
+          `Color: ${color}\n\n` +
           `URL: ${currentPageUrl}`;
-      
+
       const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(formattedMessage)}`;
-      
+
       whatsappSend.disabled = true;
       whatsappSend.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening...';
-      
+
       setTimeout(() => {
         window.open(whatsappURL, '_blank');
         whatsappSend.disabled = false;
@@ -742,9 +783,6 @@
   }
 
 
-  // ===============================
-  // 🟢 DROPDOWNS
-  // ===============================
   document.querySelectorAll(".dropdown").forEach(d => {
     const btn = d.querySelector(".drop-btn");
     if (btn) {
@@ -756,9 +794,6 @@
   });
 
 
-  // ===============================
-  // 🟢 TRACK RECENTLY VIEWED
-  // ===============================
   function trackRecentlyViewed(productId) {
     let recent = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
     recent = recent.filter(id => id !== productId);

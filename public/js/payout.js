@@ -113,7 +113,9 @@ if (radios.length > 0 && qrBox) {
 }
 
 // ─── CONFIRM ORDER ────────────────────────────────────────────────────
-function confirmOrder(orderId) {
+// ─── CONFIRM ORDER ────────────────────────────────────────────────────
+// ─── CONFIRM ORDER ────────────────────────────────────────────────────
+function confirmOrder(orderId, isDirectOrder) {
   const methodRadio = document.querySelector('input[name="pay"]:checked');
   
   if (!methodRadio) {
@@ -121,30 +123,44 @@ function confirmOrder(orderId) {
     return;
   }
 
+
   const method = methodRadio.value;
 
-  fetch("/order/confirm", {
+
+  // For direct orders (customer_name exists), use different endpoint
+  const endpoint = isDirectOrder ? "/direct-order/confirm" : "/order/confirm";
+
+
+  console.log("Confirming order:", orderId, "isDirectOrder:", isDirectOrder, "endpoint:", endpoint);
+
+
+  fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ orderId, method })
   })
-  .then(res => res.json())
+  .then(res => {
+    console.log("Response status:", res.status);
+    return res.json();
+  })
   .then(data => {
-    if (data.success) {
+    console.log("Response data:", data);
+    
+    if (data && data.success) {
       alert("Order placed successfully!");
       window.location.href = "/account";
     } else {
-      alert(data.message || "Failed to place order");
+      alert(data ? (data.message || "Failed to place order") : "Invalid response from server");
     }
   })
   .catch(err => {
-    console.error(err);
+    console.error("Error:", err);
     alert("Error placing order");
   });
 }
 
-window.confirmOrder = confirmOrder;
 
+window.confirmOrder = confirmOrder;
 
 
 
